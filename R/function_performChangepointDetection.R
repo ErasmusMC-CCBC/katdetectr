@@ -38,39 +38,45 @@
         # At least 4 observations (variants) are needed for changepoint analysis.
         if(base::length(IMD) >= 4){
             if(.test.stat == 'Exponential'){
-                changepointsChromosome <- changepoint::cpt.meanvar(
+
+                cptChromosome <- changepoint::cpt.meanvar(
                     data = IMD,
                     penalty = .penalty,
                     pen.value = .pen.value,
                     method = 'PELT',
                     test.stat = 'Exponential',
-                    class = FALSE,
+                    class = TRUE,
                     minseglen = .minseglen
                 )
             }
 
             if(.test.stat == 'Empirical'){
-                changepointsChromosome <- changepoint.np::cpt.np(
+                cptChromosome <- changepoint.np::cpt.np(
                     data = IMD,
                     penalty = .penalty,
                     pen.value = .pen.value,
                     method = 'PELT',
                     test.stat = 'empirical_distribution',
-                    class = FALSE,
+                    class = TRUE,
                     minseglen = .minseglen
                 )
             }
 
             # Add pseudo-count of 1 to all changepoints as the first variant was not included as it had no 5' IMD.
             # Add 0 as the first changepoint.
-            changepointsChromosome <- c(0, (changepointsChromosome + 1))
-
+            changepointsChromosome <- c(0, (cptChromosome@cpts + 1))
+            rateChromosome <- cptChromosome@param.est$rate
         }else{
             # For <4 observations, return first and last variant to set a single segment.
             changepointsChromosome <- c(0, (base::length(IMD) + 1))
+            rateChromosome <- NA
         }
 
-        return(changepointsChromosome)
+        resultsChromosome <- list(
+            changepointsChromosome = changepointsChromosome,
+            rateChromosome = rateChromosome
+        )
+        return(resultsChromosome)
     },
     BPPARAM = BiocParallel::MulticoreParam(workers = bpworkers))
 

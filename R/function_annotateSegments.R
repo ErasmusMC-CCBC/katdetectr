@@ -1,12 +1,34 @@
 
-.annotateSegments <- function(changepoints, genomicVariantsAnnotated){
+
+.annotateSegments <- function(changepointsPerChromosome, genomicVariantsAnnotated){
+
+    # obtain results from changepoint analysis
+    changepoints <- .getChangepoints(changepointsPerChromosome)
+    rates <- .getRates(changepointsPerChromosome)
 
     # determine for each variant in which segment it belongs based on the detected changepoints in the IMD
     segmentIDs <- .determineSegmentID(changepoints)
+
     # determine the segments and calculate additional info for each segment
-    segments <- determineSegments(genomicVariantsAnnotated, segmentIDs)
+    segments <- determineSegments(genomicVariantsAnnotated, segmentIDs, rates)
 
     return(segments)
+}
+
+
+.getChangepoints <- function(changepointsPerChromosome){
+
+    changepoints <- lapply(changepointsPerChromosome, function(chromosome){chromosome$changepointsChromosome})
+
+    return(changepoints)
+}
+
+.getRates <- function(changepointsPerChromosome){
+
+    rates <- lapply(changepointsPerChromosome, function(chromosome){chromosome$rateChromosome}) |>
+        unlist(use.names = FALSE)
+
+    return(rates)
 }
 
 .determineSegmentID <- function(changepoints){
@@ -35,7 +57,7 @@
     return(variants)
 }
 
-determineSegments <- function(genomicVariantsAnnotated, segmentIDs){
+determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
 
     segments <- genomicVariantsAnnotated |>
         .addSegmentsIDtovariants(segmentIDs = segmentIDs) |>
@@ -59,6 +81,7 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs){
             start = .data$start - .data$diff + 1
         ) |>
         dplyr::ungroup() |>
+        dplyr::mutate(mutationRate = rates) |>
         dplyr::select(!diff) |>
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE)
 

@@ -8,8 +8,6 @@ testthat::test_that("test .annotateSegments():", {
     changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, bpworkers = 1)
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
 
-
-
     testthat::expect_equal(base::length(segmentsCPTAC), 446)
     testthat::expect_equal(base::unique(segmentsCPTAC$sampleNames), "CPTAC")
     testthat::expect_equal(base::as.character(base::unique(segmentsCPTAC@seqnames[1])), "chr1")
@@ -19,6 +17,7 @@ testthat::test_that("test .annotateSegments():", {
     testthat::expect_equal(segmentsCPTAC$lastVariantID[446], 3684)
     testthat::expect_equal(segmentsCPTAC$totalVariants[443], 38)
     testthat::expect_equal(segmentsCPTAC$meanIMD[4], 1080.25)
+    testthat::expect_equal(segmentsCPTAC$mutationRate[4], 0.00092571164)
 })
 
 

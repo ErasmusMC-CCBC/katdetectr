@@ -1,6 +1,6 @@
 Package: katdetectr
 Title: Detection, Characterization and Visualization of Kataegis in Sequencing Data
-Version: 0.99.0
+Version: 0.99.1
 Authors@R: c(
     person("Daan", "Hazelaar", , "daanhazelaar@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7513-6813")),
@@ -39,20 +39,20 @@ Imports:
     Rdpack (>= 2.3),
     ggplot2 (>= 3.3.5),
     tidyr (>= 1.2.0),
-    BSgenome (>= 1.62.0)
-Suggests: 
-    BSgenome.Hsapiens.UCSC.hg38 (>= 1.4.4),
+    BSgenome (>= 1.62.0),
     ggtext (>= 0.1.1),
+    BSgenome.Hsapiens.UCSC.hg19 (>= 1.4.3),
+    BSgenome.Hsapiens.UCSC.hg38 (>= 1.4.4)
+Suggests: 
     scales (>= 1.2.0),
     knitr (>= 1.37),
     rmarkdown (>= 2.13),
-    testthat (>= 3.0.0),
-    BSgenome.Hsapiens.UCSC.hg19 (>= 1.4.3)
+    testthat (>= 3.0.0)
 RdMacros: Rdpack
 VignetteBuilder: 
     knitr
 biocViews: WholeGenome, Software, SNP, Sequencing, Classification, VariantAnnotation
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Config/testthat/edition: 3

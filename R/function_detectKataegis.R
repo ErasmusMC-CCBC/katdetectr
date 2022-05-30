@@ -2,8 +2,8 @@
 #' @description Detection of kataegis foci using changepoint detection.
 #'
 #' Changepoint detection is performed on the intermutation distance (IMD)
-#' of the variants using the changepoint \insertCite{killick2014changepoint}{katdetectr} package. 
-#' 
+#' of the variants using the changepoint \insertCite{killick2014changepoint}{katdetectr} package.
+#'
 #' Note that we recommend using the default parameters for the detection of kataegis.
 #'
 #' @param genomicVariants (\link[VariantAnnotation]{VRangesList}, VCF or MAF): VRanges, or path to VCF or MAF file containing genomic variants.
@@ -29,6 +29,8 @@
 #'
 #' @importFrom Rdpack reprompt
 #' @import BiocStyle
+#' @importFrom BSgenome.Hsapiens.UCSC.hg19 BSgenome.Hsapiens.UCSC.hg19
+#' @importFrom BSgenome.Hsapiens.UCSC.hg38 BSgenome.Hsapiens.UCSC.hg38
 #' @export
 detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, minseglen = 2, bpworkers = 1, aggregateRecords = FALSE){
 
