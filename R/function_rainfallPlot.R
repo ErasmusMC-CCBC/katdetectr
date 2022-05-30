@@ -3,7 +3,7 @@
 #'
 #' Y-axis represents the 5' intermutation distance (IMD) of each genomic variant in a log10-scale.
 #' X-axis represent the IMD for each variant. Putative kataegis foci are highlighted by blue backgrounds.
-#' 
+#'
 #' Variants within kataegis foci are bold. Color represent the mutational context whilst horizontal lines represent
 #' the detected segments (using the mean IMD). Vertical lines depict the detected changepoints.
 #'
@@ -138,7 +138,7 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
         # Labs.
         ggplot2::labs(x = base::sprintf('Sample: %s\nTotal variants: %s, putative kataegis foci: %s', base::unique(plotDataVariants$sampleNames), base::nrow(plotDataVariants), base::nrow(plotDataKataegis)), y = 'Intermutation Distance') +
 
-        # Set alpha and scale of IMD's based on flagged within hypermutated foci.
+        # Set alpha and scale of IMD's based on flagged within kataegis foci.
         ggplot2::scale_alpha_manual(values = c('TRUE' = base::ifelse(showKataegis, 1, 0.5), 'FALSE' = .3), guide = 'none') +
         ggplot2::scale_size_manual(values = c('TRUE' = base::ifelse(showKataegis, 2, 1), 'FALSE' = 1), guide = 'none') +
 
@@ -180,7 +180,7 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
         p <- p + ggplot2::geom_rect(
             data = plotDataKataegis,
             inherit.aes = FALSE,
-            ggplot2::aes(xmin = .data$firstVariantID + 1, xmax = .data$lastVariantID + 1, ymin = -1, ymax = Inf, group = .data$seqnames),
+            ggplot2::aes(xmin = .data$firstVariantID, xmax = .data$lastVariantID, ymin = -1, ymax = Inf, group = .data$seqnames),
             fill = '#0080FF30')
     }
 
