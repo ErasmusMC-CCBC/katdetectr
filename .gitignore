@@ -2,4 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-try_out.Rmd
+.Rbuildignore
+katdetectr.Rproj
+try_out.RMD
