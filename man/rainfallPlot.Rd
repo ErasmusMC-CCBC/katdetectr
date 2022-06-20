@@ -27,10 +27,10 @@ rainfallPlot(
 Visualize the IMD, segments and putative kataegis foci using a rainfall plot.
 
 Y-axis represents the 5' intermutation distance (IMD) of each genomic variant in a log10-scale.
-X-axis represent the IMD for each variant. Putative kataegis foci are highlighted by blue backgrounds.
+X-axis represent variant ID.
 
-Variants within kataegis foci are bold. Color represent the mutational context whilst horizontal lines represent
-the detected segments (using the mean IMD). Vertical lines depict the detected changepoints.
+Variants within kataegis foci are bold with the kataegis foci shown in a blue rectangle (if showKataegis = TRUE). Color represent the mutation type whilst horizontal lines represent the mean IMD of a
+segments and Vertical lines depict the detected changepoints (if showSegmentation = TRUE).
 }
 \examples{
 syntheticData <- generateSyntheticData(nBackgroundVariants = 200)
