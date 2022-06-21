@@ -22,10 +22,10 @@ setMethod('getInfo', 'KatDetect', function(x){return( x@info)})
 
 #' @export
 summary.KatDetect <- function(object, ...){
-    base::cat("Sample name:                                ", object@info$sampleName, "\n")
-    base::cat("Total number of genomic variants:           ", object@info$totalGenomicVariants, "\n")
-    base::cat("Total number of putative Kataegis foci:     ", object@info$totalKataegisFoci, "\n")
-    base::cat("Total number of variants in a Kataegis foci:", object@info$totalVariantsInKataegisFoci)
+    base::cat("Sample name:                                ", getInfo(object)$sampleName, "\n")
+    base::cat("Total number of genomic variants:           ", getInfo(object)$totalGenomicVariants, "\n")
+    base::cat("Total number of putative Kataegis foci:     ", getInfo(object)$totalKataegisFoci, "\n")
+    base::cat("Total number of variants in a Kataegis foci:", getInfo(object)$totalVariantsInKataegisFoci)
 }
 
 #' @export
@@ -37,8 +37,8 @@ setMethod("show", "KatDetect", function(object){
     base::cat("Class 'KatDetect' : KatDetect Object\n")
     base::cat("                  : S4 class containing", base::length(base::attributes(object))-1, "slots with names:\n")
     base::cat("                   ", base::names(base::attributes(object))[seq_len(base::length(base::attributes(object)))-1], "\n\n")
-    base::cat("Created on:        ", object@info$date, "\n")
-    base::cat("katdetectr version:", object@info$version,'\n\n')
+    base::cat("Created on:        ", getInfo(object)$date, "\n")
+    base::cat("katdetectr version:", getInfo(object)$version,'\n\n')
     base::cat("summary: \n--------------------------------------------------------\n")
     summary(object)
     base::cat("\n--------------------------------------------------------")

@@ -4,8 +4,8 @@
 #' @inheritParams getGenomicVariants
 #'
 #' @examples
-#' x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-#' getKataegisFoci(x)
+#' kd <- constructKatdetect()
+#' getKataegisFoci(kd)
 #'
 #' @return (GRanges): Returns a GRanges with annotated kataegis foci.
 #' @rdname getKataegisFoci
@@ -17,8 +17,8 @@ setGeneric('getKataegisFoci', function(x) standardGeneric("getKataegisFoci"))
 #' @param x (KatDetect): KatDetect object.
 #'
 #' @examples
-#' x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-#' getGenomicVariants(x)
+#' kd <- constructKatdetect()
+#' getGenomicVariants(kd)
 #'
 #' @return (VRanges): Returns a VRanges with annotated genomic variants.
 #' @rdname getGenomicVariants
@@ -30,8 +30,8 @@ setGeneric('getGenomicVariants', function(x) standardGeneric("getGenomicVariants
 #' @inheritParams getGenomicVariants
 #'
 #' @examples
-#' x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-#' getSegments(x)
+#' kd <- constructKatdetect()
+#' getSegments(kd)
 #'
 #' @return (GRanges): Returns a GRanges with annotated segments.
 #' @rdname getSegments
@@ -43,8 +43,8 @@ setGeneric('getSegments', function(x) standardGeneric("getSegments"))
 #' @inheritParams getGenomicVariants
 #'
 #' @examples
-#' x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-#' getInfo(x)
+#' kd <- constructKatdetect()
+#' getInfo(kd)
 #'
 #' @return (list): Returns a list with all model parameters used for kataegis detection.
 #' @rdname getInfo

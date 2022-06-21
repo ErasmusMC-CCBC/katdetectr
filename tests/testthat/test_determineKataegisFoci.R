@@ -5,7 +5,7 @@ testthat::test_that("test .determineKataegisFoci()", {
         .importGenomicVariants() |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
-    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, bpworkers = 1)
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
     kataegisFociCPTAC <- .determineKataegisFoci(segments = segmentsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, maxMeanIMD = 1000)
 

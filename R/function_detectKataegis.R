@@ -6,14 +6,14 @@
 #'
 #' Note that we recommend using the default parameters for the detection of kataegis.
 #'
-#' @param genomicVariants (\link[VariantAnnotation]{VRangesList}, VCF or MAF): VRanges, or path to VCF or MAF file containing genomic variants.
-#' @param minSizeKataegis (integer): Minimal no. of variants required within a segment for classification as a kataegis foci.
+#' @param genomicVariants (\link[VariantAnnotation]{VRanges}, VCF or MAF): VRanges, or path to VCF or MAF file containing genomic variants.
+#' @param minSizeKataegis (integer): Minimal number of variants required within a segment for classification as a kataegis foci.
 #' @param maxMeanIMD (integer): Max. mean IMD within a segment for classification as a kataegis foci.
 #' @param test.stat (character): Distribution that is fitted to the data (Exponential or Empirical). See \link[changepoint]{cpt.meanvar}.
 #' @param penalty (character): Penalty used to guard against overfitting (BIC or Manual). See \link[changepoint]{cpt.meanvar}.
 #' @param pen.value (integer): Only needed for manual penalty. See \link[changepoint]{cpt.meanvar}.
 #' @param minseglen (integer): Min. size of segments (no. of variants).
-#' @param bpworkers (integer): Number of cores to be used in parallelisation.
+#' @param BPPARAM (\link[BiocParallel](BiocParallelParam)): Can be used for parallelization purposes.
 #' @param aggregateRecords (logical): Aggregate multiple samples and treat as-if all records originate from a single sample.
 #'
 #' @examples
@@ -27,22 +27,18 @@
 #' @references
 #' \insertRef{killick2014changepoint}{katdetectr}
 #'
-#' @importFrom Rdpack reprompt
-#' @import BiocStyle
-#' @importFrom BSgenome.Hsapiens.UCSC.hg19 BSgenome.Hsapiens.UCSC.hg19
-#' @importFrom BSgenome.Hsapiens.UCSC.hg38 BSgenome.Hsapiens.UCSC.hg38
 #' @export
-detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, minseglen = 2, bpworkers = 1, aggregateRecords = FALSE){
+detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::MulticoreParam(workers = 1), aggregateRecords = FALSE){
 
-    validateInputdetectKataegis(genomicVariants, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value , minseglen, bpworkers, aggregateRecords)
+    validateInputdetectKataegis(genomicVariants, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value , minseglen, BPPARAM, aggregateRecords)
 
     # Import, pre-process and annotate genomic variants. ----
-    genomicVariantsImported <- .importGenomicVariants(x = genomicVariants, aggregateRecords = aggregateRecords)
+    genomicVariantsImported <- .importGenomicVariants(x = genomicVariants, aggregateRecords)
     genomicVariantsProcessed <- .processGenomicVariants(genomicVariantsImported)
     genomicVariantsAnnotated <- .annotateGenomicVariants(genomicVariantsProcessed)
 
     # Changepoint detection. ----
-    changepointsPerChromosome <- .performChangepointDetection(genomicVariantsAnnotated, test.stat, penalty, pen.value, minseglen, bpworkers = bpworkers)
+    changepointsPerChromosome <- .performChangepointDetection(genomicVariantsAnnotated, test.stat, penalty, pen.value, minseglen, BPPARAM)
 
     # Annotate segments --------------------------------------------------------
     segments <- .annotateSegments(changepointsPerChromosome, genomicVariantsAnnotated)
@@ -53,8 +49,11 @@ detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 10
     # Add kataegis foci ID to genomicVariants
     genomicVariantsAnnotatedKat <- .addKataegisIDtoVariants(kataegisFoci, genomicVariantsAnnotated)
 
+    # Obtain relevant info for info slot
+    info <- .getInfo(genomicVariantsAnnotatedKat, segments, kataegisFoci, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value, minseglen, aggregateRecords)
+
     # Initialize KatDetect ---------------------------------------------------
-    kd <- .initkatdetect(genomicVariantsAnnotatedKat, segments, kataegisFoci)
+    kd <- .initkatdetect(genomicVariantsAnnotatedKat, segments, kataegisFoci, info)
 
     return(kd)
 }

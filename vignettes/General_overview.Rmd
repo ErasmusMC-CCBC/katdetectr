@@ -10,108 +10,161 @@ package: 'katdetectr'
 output: BiocStyle::html_document
 ---
 
-<!-- ```{r knitr_init, echo = FALSE, cache = FALSE, results = 'hide', warning=FALSE, message=FALSE} -->
-<!-- suppressPackageStartupMessages(library(knitr)) -->
-<!-- suppressPackageStartupMessages(library(katdetectr)) -->
-<!-- ``` -->
 
-<!-- # Abstract -->
+# Installation
 
-<!-- `katdetectr` is an *R* package for the detection, characterization and visualization of localized hypermutated regions, often referred to as *kataegis*. -->
+To install this package, start R (version "4.2") and enter:
+```{r eval=FALSE}
+# Install via BioConductor
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
 
-<!-- Please see the [Application Note](https://www.google.com) (under submission) for additional background, details and performance evaluations of `katdetectr`. -->
+BiocManager::install("katdetectr")
 
-<!-- The general workflow of `katdetectr` can be summarized as follows: -->
+# Or install the devel version via github
+if (!require("devtools")) install.packages("devtools", repos = "http://cran.r-project.org")
 
-<!-- 1. Import of genomic variants; VCF, MAF or VRanges objects. -->
-<!-- 2. Detection of kataegis foci. -->
-<!-- 3. Visualization of segmentation and kataegis foci. -->
-
-<!-- Below, this workflow is performed in a step-by-step manner on publicly-available datasets which are included within this package. -->
+devtools::install_github(repo = "ErasmusMC-CCBC/katdetectr")
+```
 
 
-<!-- # Importing genomic variants -->
-
-<!-- Genomic variants from multiple common data-formats (VCF/MAF and VRanges objects) can be imported into katdetectr. -->
-<!-- These can be contain either single or multiple samples, in which case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record. -->
-
-<!-- From these genomic variants, we calculate the intermutation distance (IMD). The IMD is defined as the genomic distance (in bp) between a genomic variant and it's respective nearest upstream genomic variant (5' A <- B 3'). -->
-
-<!-- ```{r, label = 'Importing genomic variants', eval = TRUE} -->
-<!-- # Genomic variants stored within the VCF format. -->
-<!-- pathToVCF <- system.file(package = "katdetectr", "extdata/CPTAC_Breast.vcf") -->
-
-<!-- # Genomic variants stored within the MAF format. -->
-<!-- pathToMAF <- system.file(package = "katdetectr", "extdata/APL_primary.maf") -->
-
-<!-- # In addition, we can generate synthetic genomic variants with interjected kataegis regions -->
-<!-- # using generateSyntheticData(). This will output a VRanges object. -->
-<!-- syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci = 1) -->
-<!-- ``` -->
-
-<!-- # Detection of kataegis foci -->
-
-<!-- Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying IMD and size. -->
-<!-- Various underlying parameters can be altered to improve or alter the default methodology. -->
-
-<!-- ```{r, label = 'Detection of kataegis foci', eval = TRUE} -->
-<!-- # Detect kataegis foci within the given VCF file. -->
-<!-- kdVCF <- detectKataegis(genomicVariants = pathToVCF) -->
-
-<!-- # # Detect kataegis foci within the given MAF file. -->
-<!-- # As this file contains multiple samples, we set aggregateRecords = TRUE. -->
-<!-- kdMAF <- detectKataegis(genomicVariants = pathToMAF, aggregateRecords = TRUE) -->
-
-<!-- # Detect kataegis foci within our synthetic data. -->
-<!-- kdSynthetic <- detectKataegis(genomicVariants = syntheticData) -->
-<!-- ``` -->
+```{r}
+library(katdetectr)
+```
 
 
-<!-- All relevant input and subsequent results are stored within `KatDetect` objects. -->
-<!-- Using `summary()`, `show()` and/or `print()`, we can generate overviews of these `KatDetect` object(s). -->
+# Introduction
 
-<!-- ```{r, label = 'Overview of KatDetect objects', eval = TRUE} -->
-<!-- summary(kdVCF) -->
-<!-- print(kdVCF) -->
-<!-- show(kdVCF) -->
+`katdetectr` is an *R* package for the detection, characterization and visualization of localized hypermutated regions, often referred to as *kataegis*.
 
-<!-- # Or simply: -->
-<!-- kdVCF -->
-<!-- ``` -->
+The general workflow of `katdetectr` can be summarized as follows:
 
-<!-- Underlying data can be retrieved from these `KatDetect` objects by the following functions: -->
-<!-- ```{r, label = 'Retrieving information from KatDetect objects', eval = TRUE, results = 'hide'} -->
-<!-- # Processed genomic variants used as input for changepoint detection. -->
-<!-- getGenomicVariants(kdVCF) -->
+1. Import of genomic variants; VCF, MAF or VRanges objects.
+2. Detection of kataegis foci.
+3. Visualization of segmentation and kataegis foci.
 
-<!-- # GRanges containing the segments as derived from changepoint detection. -->
-<!-- getSegments(kdVCF) -->
+Please see the Application Note (under submission) for additional background and details of `katdetectr`. The application note also contains a performance evaluation which showed that `katdetectr` outperforms all tested competitors ([maftools](https://bioconductor.org/packages/release/bioc/html/maftools.html), [ClusteredMutations](https://cran.r-project.org/web/packages/ClusteredMutations/index.html), [SeqKat](https://cran.r-project.org/web/packages/SeqKat/index.html), [kataegis](https://github.com/flosalbizziae/kataegis), and [SigProfilerClusters](https://github.com/AlexandrovLab/SigProfilerClusters)).
 
-<!-- # GRanges containing segments designated as putative kataegis foci. -->
-<!-- getKataegisFoci(kdVCF) -->
+We have made `katdetectr` available on *BioConductor* as this insures reliability, and operability on common operation systems (Linux, Mac, and Windows)
 
-<!-- # Supplementary information. -->
-<!-- getInfo(kdVCF) -->
-<!-- ``` -->
+Below, the `katdetectr` workflow is performed in a step-by-step manner on publicly-available datasets which are included within this package.
 
 
-<!-- # Visualization of segmentation and kataegis foci -->
+# Importing genomic variants
 
-<!-- Per sample, we can visualize the IMD, detected segments and putative kataegis foci as a rainfall plot. -->
-<!-- In addition, this allows for a per-chromosome approach which can highlight the putative kataegis foci. -->
-<!-- ```{r, label = 'Visualisation of KatDetect objects', eval = TRUE} -->
-<!-- rainfallPlot(kdVCF) -->
+Genomic variants from multiple common data-formats (VCF/MAF and VRanges objects) can be imported into katdetectr.
+These can be contain either single or multiple samples, in which case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
 
-<!-- # With showSegmentation, the detected segments (changepoints) as visualized with their mean IMD. -->
-<!-- rainfallPlot(kdMAF, showSegmentation = TRUE) -->
+From these genomic variants, we calculate the intermutation distance (IMD). The IMD is defined as the genomic distance (in bp) between a genomic variant and it's respective nearest upstream genomic variant (5' A <- B 3').
 
-<!-- # With showSequence, we can display specific chromosomes or all chromosomes in which a putative kataegis foci has been detected. -->
-<!-- rainfallPlot(kdSynthetic, showKataegis = TRUE, showSegmentation = TRUE, showSequence = "Kataegis") -->
-<!-- ``` -->
+```{r, label = 'Importing genomic variants', eval = TRUE}
+# Genomic variants stored within the VCF format.
+pathToVCF <- system.file(package = "katdetectr", "extdata/CPTAC_Breast.vcf")
+
+# Genomic variants stored within the MAF format.
+pathToMAF <- system.file(package = "katdetectr", "extdata/APL_primary.maf")
+
+# In addition, we can generate synthetic genomic variants with interjected kataegis regions
+# using generateSyntheticData(). This will output a VRanges object.
+syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci = 1)
+```
+
+# Detection of kataegis foci
+
+Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying IMD and size.
+```{r, label = 'Detection of kataegis foci', eval = TRUE}
+# Detect kataegis foci within the given VCF file.
+kdVCF <- detectKataegis(genomicVariants = pathToVCF)
+
+# # Detect kataegis foci within the given MAF file.
+# As this file contains multiple samples, we set aggregateRecords = TRUE.
+kdMAF <- detectKataegis(genomicVariants = pathToMAF, aggregateRecords = TRUE)
+
+# Detect kataegis foci within our synthetic data.
+kdSynthetic <- detectKataegis(genomicVariants = syntheticData)
+```
 
 
-<!-- # Session Information -->
+All relevant input and subsequent results are stored within `KatDetect` objects.
+Using `summary()`, `show()` and/or `print()`, we can generate overviews of these `KatDetect` object(s).
 
-<!-- ```{r, label = 'Session Information', eval = TRUE} -->
-<!-- utils::sessionInfo() -->
-<!-- ``` -->
+```{r, label = 'Overview of KatDetect objects', eval = TRUE}
+summary(kdVCF)
+print(kdVCF)
+show(kdVCF)
+
+# Or simply:
+kdVCF
+```
+
+Underlying data can be retrieved from a `KatDetect` objects using the following getter functions:
+
+1. `getGenomicVariants()` returns: VRanges object. Processed genomic variants used as input for changepoint detection. This VRanges contains the genomic        location, IMD, and kataegis status of each genomic variant
+2. `getSegments()` returns: GRanges object. Contains the segments as derived from changepoint detection. This Granges contains the genomic location, total      number of variants, mean IMD and, mutation rate of each segment.
+3. `getKataegisFoci()` returns: GRanges object. Contains all segments designated as putative kataegis foci according the the specified parameters               (minSizeKataegis and maxMeanIMD). This Granges contains the genomic location, total number of variants and mean IMD of each putative kataegis foci
+4. `getInfo()` returns: List object. Contains supplementary information including used parameter settings.
+
+
+```{r, label = 'Retrieving information from KatDetect objects', eval = TRUE}
+getGenomicVariants(kdVCF)
+
+getSegments(kdVCF)
+
+getKataegisFoci(kdVCF)
+
+getInfo(kdVCF)
+```
+
+
+
+
+
+# Visualization of segmentation and kataegis foci
+
+Per sample, we can visualize the IMD, detected segments and putative kataegis foci as a rainfall plot.
+In addition, this allows for a per-chromosome approach which can highlight the putative kataegis foci.
+```{r, label = 'Visualisation of KatDetect objects', eval = TRUE}
+rainfallPlot(kdVCF)
+
+# With showSegmentation, the detected segments (changepoints) as visualized with their mean IMD.
+rainfallPlot(kdMAF, showSegmentation = TRUE)
+
+# With showSequence, we can display specific chromosomes or all chromosomes in which a putative kataegis foci has been detected.
+rainfallPlot(kdSynthetic, showKataegis = TRUE, showSegmentation = TRUE, showSequence = "Kataegis")
+```
+
+
+
+# More parameter settings
+
+`katdetectr` has been implemented flexibly which allows its users to detect clustered mutations of different classes. The historical definition of kataegis foci is a segment harboring ≥6 variants and has a mean IMD ≤1000bp. However, these parameters can be set differently in `detectKataegis()`. 
+
+For example, other classes of mutation are:
+
+1. Doublet-base substitutions (DBS): a segments harboring 2 variants with mean IMD = 0
+2. Multi-base substitutions (MBS): a segment harboring n variants with mean IMD = 0
+3. Omikli: a segment harboring 2 or 3 variants with mean IMD = m
+
+```{r}
+# detect DBS
+kdSyntheticDBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 2, maxMeanIMD = 0)
+
+# detect MBS, size = 3
+kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 0)
+
+# detect Omikli, size 3 and mean IMD = 500
+kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 500, )
+```
+
+
+We tested katdetectr with multiple parameter settings (test.stat, penalty, pen.value, minseglen) in order to obtain the highest performance in regards to kataegis classification. The best combination of parameters have been set as the default values. We recommend using these parameter settings!
+
+If your interested you can play with different parameters settings. All these parameters are passed directly to the changepoint or changepoint.np package. For more information regarding these packages see [Killick2014](https://www.jstatsoft.org/article/view/v058i03) or [Haynes2016](https://link.springer.com/article/10.1007/s11222-016-9687-5)
+
+
+
+# Session Information
+
+```{r, label = 'Session Information', eval = TRUE}
+utils::sessionInfo()
+```

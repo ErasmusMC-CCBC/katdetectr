@@ -19,7 +19,7 @@ getSegments(x)
 Retrieve segments from KatDetect a object.
 }
 \examples{
-x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-getSegments(x)
+kd <- constructKatdetect()
+getSegments(kd)
 
 }

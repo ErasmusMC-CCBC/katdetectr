@@ -14,7 +14,6 @@
 #' @slot info (list): Contains some general information and model parameters used for kataegis detection.
 #'
 #' @examples
-#' new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
 #'
 #' syntheticData <- generateSyntheticData()
 #' kd <- detectKataegis(syntheticData)
@@ -26,8 +25,6 @@
 #'
 #' @rdname KatDetect
 #' @exportClass KatDetect
-#'
-#' @importFrom rlang .data
 #'
 #' @author Daan Hazelaar
 #' @author Job van Riet
@@ -49,17 +46,7 @@ setClass(
 )
 
 
-.initkatdetect <- function(genomicVariantsAnnotatedKat, segments, kataegisFoci){
-
-    # store some information of the kataegis detection analysis
-    info <- base::list(
-        sampleName = base::as.character(base::unique(genomicVariantsAnnotatedKat@sampleNames)),
-        totalGenomicVariants = base::length(genomicVariantsAnnotatedKat),
-        totalKataegisFoci = base::length(kataegisFoci),
-        totalVariantsInKataegisFoci = base::sum(genomicVariantsAnnotatedKat$putativeKataegis),
-        version = base::as.character(utils::packageVersion('katdetectr')),
-        date = base::date()
-    )
+.initkatdetect <- function(genomicVariantsAnnotatedKat, segments, kataegisFoci, info){
 
     # create new KatDetect object
     kd <- methods::new(

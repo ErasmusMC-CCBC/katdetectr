@@ -84,9 +84,9 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
     # Check if any chromosome harbors putative kataegis, else show all chromosome by default.
     if(base::length(showSequence) == 1){
         if(showSequence == 'All'){
-            selectedSequences <- GenomeInfoDb::seqlevelsInUse(kd@genomicVariants)
-        } else if(base::length(kd@kataegisFoci) == 0 & showSequence == 'Kataegis'){
-            selectedSequences <- GenomeInfoDb::seqlevelsInUse(kd@genomicVariants)
+            selectedSequences <- GenomeInfoDb::seqlevelsInUse(getGenomicVariants(kd))
+        } else if(base::length(getKataegisFoci(kd)) == 0 & showSequence == 'Kataegis'){
+            selectedSequences <- GenomeInfoDb::seqlevelsInUse(getGenomicVariants(kd))
         } else if(showSequence == 'Kataegis'){
             selectedSequences <- kd |>
                 katdetectr::getKataegisFoci() |>

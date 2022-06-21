@@ -23,7 +23,6 @@ detected after changepoint analysis.}
 }}
 
 \examples{
-new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
 
 syntheticData <- generateSyntheticData()
 kd <- detectKataegis(syntheticData)

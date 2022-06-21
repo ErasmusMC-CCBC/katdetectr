@@ -1,6 +1,6 @@
 # Internal - Import supplied genomic variants. ----
 
-.importGenomicVariants <- function(x, aggregateRecords = FALSE){
+.importGenomicVariants <- function(x, aggregateRecords){
 
     # Input validation ----
 

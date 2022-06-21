@@ -19,7 +19,7 @@ getGenomicVariants(x)
 Retrieve genomic variants from KatDetect object.
 }
 \examples{
-x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-getGenomicVariants(x)
+kd <- constructKatdetect()
+getGenomicVariants(kd)
 
 }

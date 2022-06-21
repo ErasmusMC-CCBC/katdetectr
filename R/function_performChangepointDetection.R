@@ -1,12 +1,12 @@
 
 # this function fits a PCF model to the intermutations distances of each chromosome of each sample. The detected changepoints are returned
-.performChangepointDetection <- function(genomicVariantsAnnotated, test.stat, penalty, pen.value, minseglen, bpworkers){
+.performChangepointDetection <- function(genomicVariantsAnnotated, test.stat, penalty, pen.value, minseglen, BPPARAM){
 
     # Split on chromosome and obtain IMD.
     perChromosomeIMD <- .getIMD(genomicVariantsAnnotated)
 
     # Fit a PCF model to the IMD data and return the changepoints
-    changepoints <- .runCD(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, bpworkers)
+    changepoints <- .runCD(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, BPPARAM)
 
     return(changepoints)
 }
@@ -31,9 +31,9 @@
 }
 
 # Helper - Perform changepoint detection. ----
-.runCD <- function(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, bpworkers){
+.runCD <- function(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, BPPARAM){
 
-    changepointsPerChromosome <- BiocParallel::bplapply(perChromosomeIMD, function(IMD, .test.stat = test.stat, .penalty = penalty, .pen.value = pen.value, .minseglen = minseglen, .bpworkers = bpworkers){
+    changepointsPerChromosome <- BiocParallel::bplapply(perChromosomeIMD, function(IMD, .test.stat = test.stat, .penalty = penalty, .pen.value = pen.value, .minseglen = minseglen, .BPPARAM = BPPARAM){
 
         # At least 4 observations (variants) are needed for changepoint analysis.
         if(base::length(IMD) >= 4){
@@ -65,7 +65,7 @@
             # Add pseudo-count of 1 to all changepoints as the first variant was not included as it had no 5' IMD.
             # Add 0 as the first changepoint.
             changepointsChromosome <- c(0, (cptChromosome@cpts + 1))
-            rateChromosome <- cptChromosome@param.est$rate
+            rateChromosome <- changepoint::param.est(cptChromosome)$rate
         }else{
             # For <4 observations, return first and last variant to set a single segment.
             changepointsChromosome <- c(0, (base::length(IMD) + 1))
@@ -78,7 +78,7 @@
         )
         return(resultsChromosome)
     },
-    BPPARAM = BiocParallel::MulticoreParam(workers = bpworkers))
+    BPPARAM = BPPARAM)
 
     return(changepointsPerChromosome)
 }

@@ -1,4 +1,4 @@
-validateInputdetectKataegis <- function(genomicVariants, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value, minseglen, bpworkers, aggregateRecords){
+validateInputdetectKataegis <- function(genomicVariants, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value, minseglen, BPPARAM, aggregateRecords){
 
     checkmate::assert(
         checkmate::checkClass(genomicVariants, 'VRanges'),
@@ -12,6 +12,6 @@ validateInputdetectKataegis <- function(genomicVariants, minSizeKataegis, maxMea
     checkmate::assert_character(penalty, pattern = 'BIC|Manual')
     checkmate::assertInt(pen.value, lower = 0)
     checkmate::assertInt(minseglen, lower = 2)
-    checkmate::assertInt(bpworkers, lower = 1)
+    checkmate::check_class(BPPARAM, "BiocParallelParam")
     checkmate::assertLogical(aggregateRecords)
 }

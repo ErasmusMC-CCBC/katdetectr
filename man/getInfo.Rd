@@ -19,7 +19,7 @@ getInfo(x)
 Retrieve model parameters from a KatDetect object.
 }
 \examples{
-x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-getInfo(x)
+kd <- constructKatdetect()
+getInfo(kd)
 
 }

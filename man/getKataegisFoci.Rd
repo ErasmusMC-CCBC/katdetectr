@@ -19,7 +19,7 @@ getKataegisFoci(x)
 Retrieve kateagis foci from a KatDetect object.
 }
 \examples{
-x <- new('KatDetect', genomicVariants = VariantAnnotation::VRanges(), info = list())
-getKataegisFoci(x)
+kd <- constructKatdetect()
+getKataegisFoci(kd)
 
 }
