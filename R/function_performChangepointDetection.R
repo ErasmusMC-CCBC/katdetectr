@@ -30,17 +30,55 @@
     return(IMDs)
 }
 
+calculateRateManually <- function(chromosome, nVariants){
+
+    # lookup table for calculating mutation rate of segments with very few variants
+    # length op chromosome in bp according to BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
+    chromosomeLength <- tibble::tibble(
+        chr1 = 249250621,
+        chr2 = 243199373,
+        chr3 = 198022430,
+        chr4 = 191154276,
+        chr5 = 180915260,
+        chr6 = 171115067,
+        chr7 = 159138663,
+        chr8 = 146364022,
+        chr9 = 141213431,
+        chr10 = 135534747,
+        chr11 = 135006516,
+        chr12 = 133851895,
+        chr13 = 115169878,
+        chr14 = 107349540,
+        chr15 = 102531392,
+        chr16 = 90354753,
+        chr17 = 81195210,
+        chr18 = 78077248,
+        chr19 = 59128983,
+        chr20 = 63025520,
+        chr21 = 48129895,
+        chr22 = 51304566,
+        chrX = 155270560,
+        chrY = 59373566,
+        chrM = 16571
+    )
+
+    mutationRate <- nVariants / chromosomeLength[[chromosome]]
+
+    return(mutationRate)
+}
+
 # Helper - Perform changepoint detection. ----
 .runCD <- function(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, BPPARAM){
 
-    changepointsPerChromosome <- BiocParallel::bplapply(perChromosomeIMD, function(IMD, .test.stat = test.stat, .penalty = penalty, .pen.value = pen.value, .minseglen = minseglen, .BPPARAM = BPPARAM){
+    # loop over the elements of perChromosomeIMD. Normal map is not possible as the names of the list must be availible in the function body
+    changepointsPerChromosome <- BiocParallel::bplapply(seq(perChromosomeIMD), function(i, .test.stat = test.stat, .penalty = penalty, .pen.value = pen.value, .minseglen = minseglen, .BPPARAM = BPPARAM){
 
-        # At least 4 observations (variants) are needed for changepoint analysis.
-        if(base::length(IMD) >= 4){
+        # At least 4 observations (IMDs) are needed for changepoint analysis.
+        if(base::length(perChromosomeIMD[[i]]) >= 4){
             if(.test.stat == 'Exponential'){
 
                 cptChromosome <- changepoint::cpt.meanvar(
-                    data = IMD,
+                    data = perChromosomeIMD[[i]],
                     penalty = .penalty,
                     pen.value = .pen.value,
                     method = 'PELT',
@@ -52,7 +90,7 @@
 
             if(.test.stat == 'Empirical'){
                 cptChromosome <- changepoint.np::cpt.np(
-                    data = IMD,
+                    data = perChromosomeIMD[[i]],
                     penalty = .penalty,
                     pen.value = .pen.value,
                     method = 'PELT',
@@ -68,8 +106,9 @@
             rateChromosome <- changepoint::param.est(cptChromosome)$rate
         }else{
             # For <4 observations, return first and last variant to set a single segment.
-            changepointsChromosome <- c(0, (base::length(IMD) + 1))
-            rateChromosome <- NA
+            changepointsChromosome <- c(0, (base::length(perChromosomeIMD[[i]]) + 1))
+            # For <4 observations, the rate must be calculated manually. rate = nVariants / length of chromosome
+            rateChromosome <- calculateRateManually(chromosome = names(perChromosomeIMD[i]), nVariants = length(perChromosomeIMD[i]) + 1)
         }
 
         resultsChromosome <- list(
@@ -79,6 +118,9 @@
         return(resultsChromosome)
     },
     BPPARAM = BPPARAM)
+
+    # add back chromosome names as the names of the list
+    names(changepointsPerChromosome) <- names(perChromosomeIMD)
 
     return(changepointsPerChromosome)
 }
