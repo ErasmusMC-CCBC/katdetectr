@@ -19,7 +19,7 @@ detectKataegis(
 \arguments{
 \item{genomicVariants}{(\link[VariantAnnotation]{VRanges}, VCF or MAF): VRanges, or path to VCF or MAF file containing genomic variants.}
 
-\item{minSizeKataegis}{(integer): Minimal no. of variants required within a segment for classification as a kataegis foci.}
+\item{minSizeKataegis}{(integer): Minimal number of variants required within a segment for classification as a kataegis foci.}
 
 \item{maxMeanIMD}{(integer): Max. mean IMD within a segment for classification as a kataegis foci.}
 
@@ -31,7 +31,7 @@ detectKataegis(
 
 \item{minseglen}{(integer): Min. size of segments (no. of variants).}
 
-\item{BPPARAM}{(BiocParallelParam): Can be used for parallelization.}
+\item{BPPARAM}{(\link\href{BiocParallelParam}{BiocParallel}): Can be used for parallelization purposes.}
 
 \item{aggregateRecords}{(logical): Aggregate multiple samples and treat as-if all records originate from a single sample.}
 }
