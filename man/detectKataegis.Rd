@@ -31,7 +31,7 @@ detectKataegis(
 
 \item{minseglen}{(integer): Min. size of segments (no. of variants).}
 
-\item{BPPARAM}{(\link\href{BiocParallelParam}{BiocParallel}): Can be used for parallelization purposes.}
+\item{BPPARAM}{(\link[BiocParallel]{BiocParallelParam}): Can be used for parallelization purposes.}
 
 \item{aggregateRecords}{(logical): Aggregate multiple samples and treat as-if all records originate from a single sample.}
 }
@@ -42,7 +42,7 @@ detectKataegis(
 Detection of kataegis foci using changepoint detection.
 
 Changepoint detection is performed on the intermutation distance (IMD)
-of the variants using the changepoint \insertCite{killick2014changepoint}{katdetectr} package.
+of the variants using the changepoint (killick 2014) package.
 
 Note that we recommend using the default parameters for the detection of kataegis.
 }
@@ -52,7 +52,7 @@ kd <- detectKataegis(syntheticData)
 
 }
 \references{
-\insertRef{killick2014changepoint}{katdetectr}
+Killick R, Eckley I (2014). “changepoint: An R package for changepoint analysis.” Journal of statistical software, 58(3), 1–19.
 }
 \author{
 Daan Hazelaar

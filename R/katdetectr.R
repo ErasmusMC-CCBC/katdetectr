@@ -8,8 +8,8 @@
 #' @docType package
 #' @name katdetectr
 #'
-#' @import Rdpack
 #' @importFrom rlang .data
+#' @importFrom Rdpack reprompt
 #' @importFrom BSgenome.Hsapiens.UCSC.hg19 BSgenome.Hsapiens.UCSC.hg19
 #' @importFrom BSgenome.Hsapiens.UCSC.hg38 BSgenome.Hsapiens.UCSC.hg38
 #'

@@ -1,6 +1,6 @@
 Package: katdetectr
 Title: Detection, Characterization and Visualization of Kataegis in Sequencing Data
-Version: 0.99.5
+Version: 0.99.6
 Authors@R: c(
     person("Daan", "Hazelaar", , "daanhazelaar@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7513-6813")),
@@ -34,7 +34,7 @@ Imports:
     tibble (>= 3.1.6),
     VariantAnnotation (>= 1.38.0),
     Biobase (>= 2.54.0),
-    Rdpack (>= 2.3),
+    Rdpack (>= 2.3.1),
     ggplot2 (>= 3.3.5),
     tidyr (>= 1.2.0),
     BSgenome (>= 1.62.0),

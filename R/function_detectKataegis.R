@@ -2,7 +2,7 @@
 #' @description Detection of kataegis foci using changepoint detection.
 #'
 #' Changepoint detection is performed on the intermutation distance (IMD)
-#' of the variants using the changepoint \insertCite{killick2014changepoint}{katdetectr} package.
+#' of the variants using the changepoint (killick 2014) package.
 #'
 #' Note that we recommend using the default parameters for the detection of kataegis.
 #'
@@ -13,7 +13,7 @@
 #' @param penalty (character): Penalty used to guard against overfitting (BIC or Manual). See \link[changepoint]{cpt.meanvar}.
 #' @param pen.value (integer): Only needed for manual penalty. See \link[changepoint]{cpt.meanvar}.
 #' @param minseglen (integer): Min. size of segments (no. of variants).
-#' @param BPPARAM (\link[BiocParallel](BiocParallelParam)): Can be used for parallelization purposes.
+#' @param BPPARAM (\link[BiocParallel]{BiocParallelParam}): Can be used for parallelization purposes.
 #' @param aggregateRecords (logical): Aggregate multiple samples and treat as-if all records originate from a single sample.
 #'
 #' @examples
@@ -25,7 +25,8 @@
 #' @author Job van Riet
 #'
 #' @references
-#' \insertRef{killick2014changepoint}{katdetectr}
+#' Killick R, Eckley I (2014). “changepoint: An R package for changepoint analysis.” Journal of statistical software, 58(3), 1–19.
+#'
 #'
 #' @export
 detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::MulticoreParam(workers = 1), aggregateRecords = FALSE){
