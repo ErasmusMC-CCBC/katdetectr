@@ -24,20 +24,7 @@ Not yet published.
 
 ## Installation
 
-The latest development version can be installed directly from GitHub:
-
-```R
-# Require/install devtools package if not already installed.
-if (!require("devtools")) install.packages("devtools", repos = "http://cran.r-project.org")
-
-# Install katdetectr from GitHub.
-devtools::install_github(repo = "ErasmusMC-CCBC/katdetectr")
-
-# Download all required packages
-library(katdetectr)
-```
-
-Or from BioConductor:
+Download katdetectr from BioConductor:
 ```R
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -49,7 +36,3 @@ BiocManager::install("katdetectr")
 # Usage
 
 Please view the vignettes for instructions and tutorials on how to use this package.
-
-```R
-browseVignettes("katdetectr")
-```
