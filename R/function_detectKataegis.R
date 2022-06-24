@@ -29,7 +29,7 @@
 #'
 #'
 #' @export
-detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::MulticoreParam(workers = 1), aggregateRecords = FALSE){
+detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::SerialParam(), aggregateRecords = FALSE){
 
     validateInputdetectKataegis(genomicVariants, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value , minseglen, BPPARAM, aggregateRecords)
 

@@ -12,7 +12,7 @@ detectKataegis(
   penalty = "BIC",
   pen.value = 0,
   minseglen = 2,
-  BPPARAM = BiocParallel::MulticoreParam(workers = 1),
+  BPPARAM = BiocParallel::SerialParam(),
   aggregateRecords = FALSE
 )
 }
