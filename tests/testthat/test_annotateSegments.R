@@ -10,16 +10,15 @@ testthat::test_that("test .annotateSegments():", {
 
     testthat::expect_equal(base::length(segmentsCPTAC), 446)
     testthat::expect_equal(base::unique(segmentsCPTAC$sampleNames), "CPTAC")
-    testthat::expect_equal(base::as.character(base::unique(segmentsCPTAC@seqnames[1])), "chr1")
+    testthat::expect_equal(base::as.character(base::unique(GenomicRanges::seqnames(segmentsCPTAC)[1])), "chr1")
     testthat::expect_equal(segmentsCPTAC$segmentID[5], 5)
-    testthat::expect_equal(GenomicRanges::end(segmentsCPTAC@ranges[446]), 153764217)
+    testthat::expect_equal(GenomicRanges::end(GenomicRanges::ranges(segmentsCPTAC)[446]), 153764217)
     testthat::expect_equal(segmentsCPTAC$lastVariantID[446], 3684)
     testthat::expect_equal(segmentsCPTAC$lastVariantID[446], 3684)
     testthat::expect_equal(segmentsCPTAC$totalVariants[443], 38)
     testthat::expect_equal(segmentsCPTAC$meanIMD[4], 1080.25)
     testthat::expect_equal(segmentsCPTAC$mutationRate[4], 0.00092571164)
 })
-
 
 
 testthat::test_that("test .determineSegmentID:", {

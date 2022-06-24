@@ -44,7 +44,7 @@ testthat::test_that("test .annotateKataegisSegments()", {
 
     testthat::expect_equal(base::length(katSegsAnno), 2)
     testthat::expect_equal(katSegsAnno$fociID, c(1, 2))
-    testthat::expect_equal(base::as.character(katSegsAnno@seqnames), c("chr1", "chrX"))
+    testthat::expect_equal(base::as.character(GenomicRanges::seqnames(katSegsAnno)), c("chr1", "chrX"))
     testthat::expect_equal(katSegsAnno$sampleNames, c("testSample", "testSample"))
     testthat::expect_equal(katSegsAnno$totalVariants, c(516, 113))
     testthat::expect_equal(katSegsAnno$firstVariantID, c(11, 540))

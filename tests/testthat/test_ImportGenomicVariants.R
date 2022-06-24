@@ -6,7 +6,7 @@ testthat::test_that("test .importGenomicVariants():", {
 
     testthat::expect_s4_class(vrCPTAC, "VRanges")
     testthat::expect_equal(base::length(vrCPTAC), 3687)
-    testthat::expect_equal(vrCPTAC@ref[1], "C")
+    testthat::expect_equal(VariantAnnotation::ref(vrCPTAC)[1], "C")
 })
 
 testthat::test_that("test coerceMAFtoVRanges():", {
@@ -15,10 +15,11 @@ testthat::test_that("test coerceMAFtoVRanges():", {
 
     testthat::expect_s4_class(vr, "VRanges")
     testthat::expect_equal(base::length(vr), 224)
-    testthat::expect_equal(base::length(base::levels(base::unique(vr@sampleNames))), 97)
-    testthat::expect_equal(vr@ref[2], "G")
-    testthat::expect_equal(base::as.character(vr@seqnames[1]), "chr17")
+    testthat::expect_equal(base::length(base::levels(base::unique(VariantAnnotation::sampleNames(vr)))), 97)
+    testthat::expect_equal(VariantAnnotation::ref(vr)[2], "G")
+    testthat::expect_equal(base::as.character(GenomicRanges::seqnames(vr)[1]), "chr17")
 })
+
 
 testthat::test_that("test coerceVCFtoVRanges():", {
 
@@ -27,7 +28,7 @@ testthat::test_that("test coerceVCFtoVRanges():", {
 
     testthat::expect_s4_class(vr, "VRanges")
     testthat::expect_equal(base::length(vr), 3687)
-    testthat::expect_equal(base::length(base::levels(base::unique(vr@sampleNames))), 1)
-    testthat::expect_equal(vr@ref[21], "G")
-    testthat::expect_equal(base::as.character(vr@seqnames[1]), "chr1")
+    testthat::expect_equal(base::length(base::levels(base::unique(VariantAnnotation::sampleNames(vr)))), 1)
+    testthat::expect_equal(VariantAnnotation::ref(vr)[21], "G")
+    testthat::expect_equal(base::as.character(GenomicRanges::seqnames(vr)[1]), "chr1")
 })
