@@ -8,6 +8,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 package: 'katdetectr'
 output: BiocStyle::html_document
+toc: TRUE
 ---
 
 
@@ -20,11 +21,6 @@ if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("katdetectr")
-
-# Or install the devel version via github
-if (!require("devtools")) install.packages("devtools", repos = "http://cran.r-project.org")
-
-devtools::install_github(repo = "ErasmusMC-CCBC/katdetectr")
 ```
 
 
@@ -43,7 +39,7 @@ The general workflow of `katdetectr` can be summarized as follows:
 2. Detection of kataegis foci.
 3. Visualization of segmentation and kataegis foci.
 
-Please see the Application Note (under submission) for additional background and details of `katdetectr`. The application note also contains a performance evaluation which showed that `katdetectr` outperforms all tested competitors ([maftools](https://bioconductor.org/packages/release/bioc/html/maftools.html), [ClusteredMutations](https://cran.r-project.org/web/packages/ClusteredMutations/index.html), [SeqKat](https://cran.r-project.org/web/packages/SeqKat/index.html), [kataegis](https://github.com/flosalbizziae/kataegis), and [SigProfilerClusters](https://github.com/AlexandrovLab/SigProfilerClusters)).
+Please see the Application Note (under submission) for additional background and details of `katdetectr`. The application note also section regarding the performance of `katdetectr` and other kataegis detection packages: ([maftools](https://bioconductor.org/packages/release/bioc/html/maftools.html), [ClusteredMutations](https://cran.r-project.org/web/packages/ClusteredMutations/index.html), [SeqKat](https://cran.r-project.org/web/packages/SeqKat/index.html), [kataegis](https://github.com/flosalbizziae/kataegis), and [SigProfilerClusters](https://github.com/AlexandrovLab/SigProfilerClusters)).
 
 We have made `katdetectr` available on *BioConductor* as this insures reliability, and operability on common operation systems (Linux, Mac, and Windows)
 
