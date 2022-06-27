@@ -8,7 +8,7 @@ testthat::test_that("test .performChangepointDetection:", {
         .processGenomicVariants() |>
         .annotateGenomicVariants()
 
-    resPCFCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+    resPCFCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::SerialParam())
 
 
 

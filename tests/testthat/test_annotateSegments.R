@@ -5,7 +5,7 @@ testthat::test_that("test .annotateSegments():", {
     .importGenomicVariants() |>
     .processGenomicVariants() |>
     .annotateGenomicVariants()
-    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::MulticoreParam(workers = 1))
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::SerialParam())
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
 
     testthat::expect_equal(base::length(segmentsCPTAC), 446)

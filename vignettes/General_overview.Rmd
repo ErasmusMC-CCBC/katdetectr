@@ -150,7 +150,7 @@ kdSyntheticDBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegi
 kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 0)
 
 # detect Omikli, size 3 and mean IMD = 500
-kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 500, )
+kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 500)
 ```
 
 
