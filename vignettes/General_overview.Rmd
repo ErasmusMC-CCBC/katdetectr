@@ -7,8 +7,9 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 package: 'katdetectr'
-output: BiocStyle::html_document
-toc: TRUE
+output: 
+    BiocStyle::html_document:
+        toc: TRUE
 ---
 
 
@@ -39,20 +40,16 @@ The general workflow of `katdetectr` can be summarized as follows:
 2. Detection of kataegis foci.
 3. Visualization of segmentation and kataegis foci.
 
-Please see the Application Note (under submission) for additional background and details of `katdetectr`. The application note also section regarding the performance of `katdetectr` and other kataegis detection packages: ([maftools](https://bioconductor.org/packages/release/bioc/html/maftools.html), [ClusteredMutations](https://cran.r-project.org/web/packages/ClusteredMutations/index.html), [SeqKat](https://cran.r-project.org/web/packages/SeqKat/index.html), [kataegis](https://github.com/flosalbizziae/kataegis), and [SigProfilerClusters](https://github.com/AlexandrovLab/SigProfilerClusters)).
+Please see the Application Note (under submission) for additional background and details of `katdetectr`. The application note also section regarding the performance of `katdetectr` and other kataegis detection packages: [maftools](https://bioconductor.org/packages/release/bioc/html/maftools.html), [ClusteredMutations](https://cran.r-project.org/web/packages/ClusteredMutations/index.html), [SeqKat](https://cran.r-project.org/web/packages/SeqKat/index.html), [kataegis](https://github.com/flosalbizziae/kataegis), and [SigProfilerClusters](https://github.com/AlexandrovLab/SigProfilerClusters).
 
-We have made `katdetectr` available on *BioConductor* as this insures reliability, and operability on common operation systems (Linux, Mac, and Windows)
+We have made `katdetectr` available on *BioConductor* as this insures reliability, and operability on common operation systems (Linux, Mac, and Windows).
 
 Below, the `katdetectr` workflow is performed in a step-by-step manner on publicly-available datasets which are included within this package.
 
 
 # Importing genomic variants
 
-Genomic variants from multiple common data-formats (VCF/MAF and VRanges objects) can be imported into katdetectr.
-These can be contain either single or multiple samples, in which case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
-
-From these genomic variants, we calculate the intermutation distance (IMD). The IMD is defined as the genomic distance (in bp) between a genomic variant and it's respective nearest upstream genomic variant (5' A <- B 3').
-
+Genomic variants from multiple common data-formats (VCF/MAF and VRanges objects) can be imported into `katdetectr`.
 ```{r, label = 'Importing genomic variants', eval = TRUE}
 # Genomic variants stored within the VCF format.
 pathToVCF <- system.file(package = "katdetectr", "extdata/CPTAC_Breast.vcf")
@@ -60,7 +57,7 @@ pathToVCF <- system.file(package = "katdetectr", "extdata/CPTAC_Breast.vcf")
 # Genomic variants stored within the MAF format.
 pathToMAF <- system.file(package = "katdetectr", "extdata/APL_primary.maf")
 
-# In addition, we can generate synthetic genomic variants with interjected kataegis regions
+# In addition, we can generate synthetic genomic variants including kataegis foci.
 # using generateSyntheticData(). This will output a VRanges object.
 syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci = 1)
 ```
@@ -68,15 +65,19 @@ syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci
 # Detection of kataegis foci
 
 Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying IMD and size.
+
+Imported samples can contain either single or multiple samples, in which case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
+
+From the genomic variants data, we calculate the intermutation distance (IMD). The IMD is defined as the genomic distance (in bp) between a genomic variant and it's respective nearest upstream genomic variant (5' A <- B 3'). Following, changepoint analysis is performed on the IMD of the genomic variants which results in segments. Lastly, a segment is labelled as *kataegis foci* if the segment fits the following parameters: ` minSizeKataegis = 6` and `maxMeanIMD = 1000`.
 ```{r, label = 'Detection of kataegis foci', eval = TRUE}
 # Detect kataegis foci within the given VCF file.
 kdVCF <- detectKataegis(genomicVariants = pathToVCF)
-
+    
 # # Detect kataegis foci within the given MAF file.
 # As this file contains multiple samples, we set aggregateRecords = TRUE.
 kdMAF <- detectKataegis(genomicVariants = pathToMAF, aggregateRecords = TRUE)
 
-# Detect kataegis foci within our synthetic data.
+# Detect kataegis foci within the synthetic data.
 kdSynthetic <- detectKataegis(genomicVariants = syntheticData)
 ```
 
