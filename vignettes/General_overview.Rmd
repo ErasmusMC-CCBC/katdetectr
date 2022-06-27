@@ -142,14 +142,16 @@ For example, other classes of mutation are:
 2. Multi-base substitutions (MBS): a segment harboring n variants with mean IMD = 0
 3. Omikli: a segment harboring 2 or 3 variants with mean IMD = m
 
+Note that we did not evaluate the performance of `katdetectr` in regards to detecting these cluster types. The following is just to show you how to change the parameters of `detectKataegis()` if you want to use `katdetectr` for detecting these types of clusters.
+
 ```{r}
-# detect DBS
+# detect putative DBS
 kdSyntheticDBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 2, maxMeanIMD = 0)
 
-# detect MBS, size = 3
+# detect putative MBS, size = 3
 kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 0)
 
-# detect Omikli, size 3 and mean IMD = 500
+# detect putative Omikli, size 3 and mean IMD = 500
 kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 500)
 ```
 
