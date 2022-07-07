@@ -9,6 +9,7 @@
 #'
 #' A dataset that contains the genomic location and other attributes of 3687 genomic variants originated from a primary breast cancer tumor.
 #'
+#'Mertins P. et al. (2016 ) Proteogenomics connects somatic mutations to signalling in breast cancer . Nature , 534 , 55 –62 .
 #'@source \url{https://gdc.cancer.gov/access-data}
 "CPTAC_Breast.vcf"
 
