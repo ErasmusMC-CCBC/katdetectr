@@ -32,7 +32,3 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("katdetectr")
 
 ```
-
-# Usage
-
-Please view the vignettes for instructions and tutorials on how to use this package.
