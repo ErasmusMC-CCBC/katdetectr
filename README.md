@@ -6,7 +6,7 @@
 
 `katdetectr` is an *R* package for the detection, characterization and visualization of localized hypermutated regions, often referred to as *kataegis*.
 
-Please see the [Application Note](https://www.google.com) (under submission) for additional background, details and performance evaluations of `katdetectr`.
+Please see the [Application Note](https://www.biorxiv.org/content/10.1101/2022.07.11.499364v1) (under submission) for additional background, details and performance evaluations of `katdetectr`.
 
 The general workflow of `katdetectr` can be summarized as follows:
 
