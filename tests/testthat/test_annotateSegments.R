@@ -2,22 +2,22 @@ testthat::test_that("test .annotateSegments():", {
 
     # test on maf file
     genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
-    .importGenomicVariants() |>
-    .processGenomicVariants() |>
-    .annotateGenomicVariants()
+        .importGenomicVariants() |>
+        .processGenomicVariants() |>
+        .annotateGenomicVariants()
+
     changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::SerialParam())
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
 
-    testthat::expect_equal(base::length(segmentsCPTAC), 446)
+    testthat::expect_equal(base::length(segmentsCPTAC), 454)
     testthat::expect_equal(base::unique(segmentsCPTAC$sampleNames), "CPTAC")
     testthat::expect_equal(base::as.character(base::unique(GenomicRanges::seqnames(segmentsCPTAC)[1])), "chr1")
     testthat::expect_equal(segmentsCPTAC$segmentID[5], 5)
-    testthat::expect_equal(GenomicRanges::end(GenomicRanges::ranges(segmentsCPTAC)[446]), 153764217)
-    testthat::expect_equal(segmentsCPTAC$lastVariantID[446], 3684)
-    testthat::expect_equal(segmentsCPTAC$lastVariantID[446], 3684)
-    testthat::expect_equal(segmentsCPTAC$totalVariants[443], 38)
-    testthat::expect_equal(segmentsCPTAC$meanIMD[4], 1080.25)
-    testthat::expect_equal(segmentsCPTAC$mutationRate[4], 0.00092571164)
+    testthat::expect_equal(GenomicRanges::end(GenomicRanges::ranges(segmentsCPTAC)[446]), 50728062)
+    testthat::expect_equal(segmentsCPTAC$lastVariantID[446], 3622)
+    testthat::expect_equal(segmentsCPTAC$totalVariants[443], 18)
+    testthat::expect_equal(segmentsCPTAC$meanIMD[4], 1081.25)
+    testthat::expect_equal(segmentsCPTAC$mutationRate[4], 0.0009248555)
 })
 
 
@@ -44,3 +44,4 @@ testthat::test_that("test .determineSegmentIDperChr:", {
     testthat::expect_equal(segmentIDs[56], 5)
     testthat::expect_equal(segmentIDs[61], 6)
 })
+

@@ -1,3 +1,4 @@
+# TODO make sure that the final segments span the entire genome. Now the segments only span from the first to the last variant
 
 # this function fits a PCF model to the intermutations distances of each chromosome of each sample. The detected changepoints are returned
 .performChangepointDetection <- function(genomicVariantsAnnotated, test.stat, penalty, pen.value, minseglen, BPPARAM){
@@ -18,11 +19,7 @@
 
     IMDs <- base::lapply(genomicVariantsPerChromosome, function(chromosome){
 
-        # Remove the first variant of the sequence (which has no IMD).
-        IMDraw <- stats::na.omit(chromosome$IMD)
-
-        # Change 0 to 0.001 as 0 cannot be sampled from an exponential distribution
-        IMD <- base::ifelse(IMDraw == 0, 0.001, IMDraw)
+        IMD <- chromosome$IMD
 
         return(IMD)
     })
@@ -30,11 +27,13 @@
     return(IMDs)
 }
 
-calculateRateManually <- function(chromosome, nVariants){
+#TODO add lookup table for hg38 and add logic for sequences that are not present in the lookup table
+
+getChromosomeLength <- function(chromosome){
 
     # lookup table for calculating mutation rate of segments with very few variants
     # length op chromosome in bp according to BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
-    chromosomeLength <- tibble::tibble(
+    chromosomeLengthTib <- tibble::tibble(
         chr1 = 249250621,
         chr2 = 243199373,
         chr3 = 198022430,
@@ -62,15 +61,15 @@ calculateRateManually <- function(chromosome, nVariants){
         chrM = 16571
     )
 
-    mutationRate <- nVariants / chromosomeLength[[chromosome]]
+    chromosomeLength <- chromosomeLengthTib[[chromosome]]
 
-    return(mutationRate)
+    return(chromosomeLength)
 }
 
 # Helper - Perform changepoint detection. ----
 .runCD <- function(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, BPPARAM){
 
-    # loop over the elements of perChromosomeIMD. Normal map is not possible as the names of the list must be availible in the function body
+    # loop over the elements of perChromosomeIMD. Normal map is not possible as the names of the list must be available in the function body
     changepointsPerChromosome <- BiocParallel::bplapply(seq(perChromosomeIMD), function(i, .test.stat = test.stat, .penalty = penalty, .pen.value = pen.value, .minseglen = minseglen, .BPPARAM = BPPARAM){
 
         # At least 4 observations (IMDs) are needed for changepoint analysis.
@@ -102,13 +101,13 @@ calculateRateManually <- function(chromosome, nVariants){
 
             # Add pseudo-count of 1 to all changepoints as the first variant was not included as it had no 5' IMD.
             # Add 0 as the first changepoint.
-            changepointsChromosome <- c(0, (cptChromosome@cpts + 1))
+            changepointsChromosome <- c(0, cptChromosome@cpts)
             rateChromosome <- changepoint::param.est(cptChromosome)$rate
         }else{
             # For <4 observations, return first and last variant to set a single segment.
-            changepointsChromosome <- c(0, (base::length(perChromosomeIMD[[i]]) + 1))
+            changepointsChromosome <- c(0, (base::length(perChromosomeIMD[[i]])))
             # For <4 observations, the rate must be calculated manually. rate = nVariants / length of chromosome
-            rateChromosome <- calculateRateManually(chromosome = names(perChromosomeIMD[i]), nVariants = length(perChromosomeIMD[i]) + 1)
+            rateChromosome <- length(perChromosomeIMD[i]) / getChromosomeLength(chromosome = names(perChromosomeIMD[i]))
         }
 
         resultsChromosome <- list(

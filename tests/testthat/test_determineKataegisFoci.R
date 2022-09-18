@@ -9,13 +9,13 @@ testthat::test_that("test .determineKataegisFoci()", {
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
     kataegisFociCPTAC <- .determineKataegisFoci(segments = segmentsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, maxMeanIMD = 1000)
 
-    testthat::expect_equal(base::length(kataegisFociCPTAC), 16)
+    testthat::expect_equal(base::length(kataegisFociCPTAC), 14)
     testthat::expect_equal(kataegisFociCPTAC$fociID[1], 1)
     testthat::expect_equal(kataegisFociCPTAC$sampleNames[1], "CPTAC")
     testthat::expect_equal(kataegisFociCPTAC$totalVariants[1], 5)
     testthat::expect_equal(kataegisFociCPTAC$firstVariantID[1], 363)
     testthat::expect_equal(kataegisFociCPTAC$lastVariantID[1], 367)
-    testthat::expect_equal(round(kataegisFociCPTAC$meanIMD[1]), 246)
+    testthat::expect_equal(round(kataegisFociCPTAC$meanIMD[1]), 247)
 })
 
 testthat::test_that("test .annotateKataegisSegments()", {
