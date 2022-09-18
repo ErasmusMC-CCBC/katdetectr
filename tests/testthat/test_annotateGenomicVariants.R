@@ -6,8 +6,9 @@ testthat::test_that("test .annotateGenomicVariants:", {
         .processGenomicVariants() |>
         .annotateGenomicVariants()
 
-    testthat::expect_equal(genomicVariantsAnnotated$IMD[1], base::as.numeric(NA))
-    testthat::expect_equal(genomicVariantsAnnotated$IMD[2], 14385)
+    testthat::expect_equal(genomicVariantsAnnotated$IMD[1], 935222)
+    testthat::expect_equal(genomicVariantsAnnotated$IMD[2], 14386)
+    testthat::expect_equal(genomicVariantsAnnotated$IMD[436], 9628448)
 })
 
 testthat::test_that("test .determineIMD():", {
@@ -21,9 +22,9 @@ testthat::test_that("test .determineIMD():", {
 
     vrIMD <- .determineIMD(vr)
 
-    testthat::expect_equal(vrIMD$IMD[1], base::as.numeric(NA))
-    testthat::expect_equal(vrIMD$IMD[2], 0)
-    testthat::expect_equal(vrIMD$IMD[3], 13)
-    testthat::expect_equal(vrIMD$IMD[4], 4)
-    testthat::expect_equal(vrIMD$IMD[5], 3)
+    testthat::expect_equal(vrIMD$IMD[1], 1)
+    testthat::expect_equal(vrIMD$IMD[2], 5)
+    testthat::expect_equal(vrIMD$IMD[3], 14)
+    testthat::expect_equal(vrIMD$IMD[4], 5)
+    testthat::expect_equal(vrIMD$IMD[5], 6)
 })

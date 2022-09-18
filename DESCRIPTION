@@ -40,7 +40,8 @@ Imports:
     BSgenome (>= 1.62.0),
     ggtext (>= 0.1.1),
     BSgenome.Hsapiens.UCSC.hg19 (>= 1.4.3),
-    BSgenome.Hsapiens.UCSC.hg38 (>= 1.4.4)
+    BSgenome.Hsapiens.UCSC.hg38 (>= 1.4.4),
+    plyranges (>= 1.17.0)
 Suggests: 
     scales (>= 1.2.0),
     knitr (>= 1.37),

@@ -67,18 +67,18 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
             totalVariants = base::sum(dplyr::n()),
             firstVariantID = base::min(.data$variantID),
             lastVariantID = base::max(.data$variantID),
+            end = base::max(.data$start),
             start = base::min(.data$start),
-            end = base::max(.data$end),
             meanIMD = base::mean(.data$IMD, na.rm = TRUE),
             sampleNames = base::as.character(base::unique(.data$sampleNames))
         ) |>
-        # replace mean IMD to NA if NAN
-        dplyr::na_if('NaN') |>
         dplyr::group_by(.data$sampleNames, .data$seqnames) |>
-        # update start column to make sure segments border each other.
         dplyr::mutate(
+            # update start column to make sure segments border each other.
             diff = base::ifelse(!base::is.na(dplyr::lag(.data$end)), .data$start - dplyr::lag(.data$end), 0),
-            start = .data$start - .data$diff + 1
+            start = .data$start - .data$diff + 1,
+            # make sure the first segment starts at the beginning of the sequence
+            start = c(1, .data$start[-1])
         ) |>
         dplyr::ungroup() |>
         dplyr::mutate(mutationRate = rates) |>

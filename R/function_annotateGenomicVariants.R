@@ -1,7 +1,11 @@
 # Internal - Annotate genomic variants. ----
 .annotateGenomicVariants <- function(genomicVariants){
 
-    genomicVariantsAnnotated <- .determineIMD(genomicVariants)
+    genomicVariantsSplitonChr <- base::split(genomicVariants, GenomeInfoDb::seqnames(genomicVariants))
+
+    genomicVariantsAnnotatedList <- base::lapply(genomicVariantsSplitonChr, .determineIMD)
+
+    genomicVariantsAnnotated <- plyranges::bind_ranges(genomicVariantsAnnotatedList)
 
     return(genomicVariantsAnnotated)
 }
@@ -9,7 +13,12 @@
 # Helper - Calculate the 5' intermutation distance (IMD) ----
 .determineIMD <- function(genomicVariants){
 
-    genomicVariants$IMD <- c(base::as.numeric(NA), GenomicRanges::distance(genomicVariants[-base::length(genomicVariants)], genomicVariants[-1]))
+    genomicVariants$IMD <- c(GenomicRanges::start(genomicVariants)[1],
+                             GenomicRanges::start(genomicVariants)[-1] - GenomicRanges::start(genomicVariants)[-base::length(genomicVariants)]
+                             )
 
     return(genomicVariants)
 }
+
+
+# TODO add segment ID to genomic variants for easy filtering

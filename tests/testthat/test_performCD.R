@@ -1,5 +1,3 @@
-
-
 testthat::test_that("test .performChangepointDetection:", {
 
     # test on larger breast cancer sample
@@ -19,10 +17,10 @@ testthat::test_that("test .performChangepointDetection:", {
 
     testthat::expect_equal(round(resPCFCPTAC$chr1$rateChromosome[1], 4), 0)
     testthat::expect_equal(round(resPCFCPTAC$chr1$rateChromosome[2], 4), 0.0001)
-    testthat::expect_equal(round(resPCFCPTAC$chr1$rateChromosome[27], 4), 0.0153)
+    testthat::expect_equal(round(resPCFCPTAC$chr1$rateChromosome[27], 4), 0.0150)
     testthat::expect_equal(round(resPCFCPTAC$chr1$rateChromosome[47], 4), 0)
 
     testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[1], 0)
-    testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[2], 5)
-    testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[6], 56)
+    testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[2], 2)
+    testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[7], 56)
 })
