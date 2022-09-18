@@ -18,6 +18,21 @@ testthat::test_that("test .annotateSegments():", {
     testthat::expect_equal(segmentsCPTAC$totalVariants[443], 18)
     testthat::expect_equal(segmentsCPTAC$meanIMD[4], 1081.25)
     testthat::expect_equal(segmentsCPTAC$mutationRate[4], 0.0009248555)
+    testthat::expect_equal(segmentsCPTAC@ranges@start[1], 1)
+    testthat::expect_equal(segmentsCPTAC$totalVariants[1] / segmentsCPTAC@ranges@width[1], segmentsCPTAC$mutationRate[1])
+    testthat::expect_equal(segmentsCPTAC@ranges@start[449], 1)
+    testthat::expect_equal(segmentsCPTAC@ranges@start[450], 3228145)
+    testthat::expect_equal(segmentsCPTAC$totalVariants[454] / segmentsCPTAC@ranges@width[454], segmentsCPTAC$mutationRate[454])
+
+    # The weighted mean of the mutation rate of all segments in a chromosome must equal the rate of the entire chromosome
+    testTotalRateChrx <- segmentsCPTAC |>
+        dplyr::as_tibble() |>
+        dplyr::filter(seqnames == "chrX")
+
+    MutationRateChrX <- base::sum(testTotalRateChrx$totalVariants) / base::sum(testTotalRateChrx$width)
+    meanRateSegments <- stats::weighted.mean(testTotalRateChrx$mutationRate, testTotalRateChrx$width)
+
+    testthat::expect_equal(MutationRateChrX, meanRateSegments)
 })
 
 
