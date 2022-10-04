@@ -1,4 +1,3 @@
-#  TODO fix tests for generatesyntehtic data
 testthat::test_that("test .generateBackgroundVariants():", {
 
     base::set.seed(1)

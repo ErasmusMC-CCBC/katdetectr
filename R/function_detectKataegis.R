@@ -48,7 +48,7 @@ detectKataegis <- function(genomicVariants, minSizeKataegis = 6, maxMeanIMD = 10
     kataegisFoci <- .determineKataegisFoci(segments, genomicVariantsAnnotated, minSizeKataegis, maxMeanIMD)
 
     # Add kataegis foci ID to genomicVariants
-    genomicVariantsAnnotatedKat <- .addKataegisIDtoVariants(kataegisFoci, genomicVariantsAnnotated)
+    genomicVariantsAnnotatedKat <- .addIDsToVariants(kataegisFoci, genomicVariantsAnnotated, changepointsPerChromosome)
 
     # Obtain relevant info for info slot
     info <- .getInfo(genomicVariantsAnnotatedKat, segments, kataegisFoci, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value, minseglen, aggregateRecords)
