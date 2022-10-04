@@ -22,5 +22,5 @@ testthat::test_that("test .performChangepointDetection:", {
 
     testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[1], 0)
     testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[2], 2)
-    testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[7], 56)
+    testthat::expect_equal(resPCFCPTAC$chrX$changepointsChromosome[7], 55)
 })

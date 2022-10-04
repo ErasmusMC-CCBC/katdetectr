@@ -1,5 +1,3 @@
-# TODO make sure that the final segments span the entire genome. Now the segments only span from the first to the last variant
-
 # this function fits a PCF model to the intermutations distances of each chromosome of each sample. The detected changepoints are returned
 .performChangepointDetection <- function(genomicVariantsAnnotated, test.stat, penalty, pen.value, minseglen, BPPARAM){
 
@@ -21,7 +19,17 @@
 
         IMD <- chromosome$IMD
 
-        return(IMD)
+        # In order to consider the whole (finite) DNA sequence I add one pseudo IMD which is the distance from the last variant to the end of the DNA sequence
+        # This is necessary to make sure that the sum of all the rates detected in changepoint analysis equal the mutation rate of the entire chromosome
+        chromosomeLength <- chromosome@seqnames |>
+            unique() |>
+            getChromosomeLength()
+
+        distanceToEndChr <- chromosomeLength - sum(IMD)
+
+        IMDfullSequence <- c(IMD, distanceToEndChr)
+
+        return(IMDfullSequence)
     })
 
     return(IMDs)
@@ -31,7 +39,7 @@
 
 getChromosomeLength <- function(chromosome){
 
-    # lookup table for calculating mutation rate of segments with very few variants
+    # lookup table for calculating mutation rate of segments with < 4 variants
     # length op chromosome in bp according to BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
     chromosomeLengthTib <- tibble::tibble(
         chr1 = 249250621,
@@ -99,15 +107,18 @@ getChromosomeLength <- function(chromosome){
                 )
             }
 
-            # Add pseudo-count of 1 to all changepoints as the first variant was not included as it had no 5' IMD.
-            # Add 0 as the first changepoint.
-            changepointsChromosome <- c(0, cptChromosome@cpts)
+            # Add 0 as the first changepoint. And substract 1 from the last changepoint due to the added pseudo IMD
+            changepointsChromosome <- c(0,
+                                        cptChromosome@cpts[-base::length(cptChromosome@cpts)],
+                                        cptChromosome@cpts[base::length(cptChromosome@cpts)] - 1)
             rateChromosome <- changepoint::param.est(cptChromosome)$rate
         }else{
-            # For <4 observations, return first and last variant to set a single segment.
-            changepointsChromosome <- c(0, (base::length(perChromosomeIMD[[i]])))
+            # For <4 observations, return first and last variant as changepoints to set a single segment.
+            # ubstract 1 from the last changepoint due to the added pseudo IMD
+            changepointsChromosome <- c(0, base::length(perChromosomeIMD[[i]]) - 1)
             # For <4 observations, the rate must be calculated manually. rate = nVariants / length of chromosome
-            rateChromosome <- length(perChromosomeIMD[i]) / getChromosomeLength(chromosome = names(perChromosomeIMD[i]))
+            chromosomeLength <- getChromosomeLength(chromosome = names(perChromosomeIMD[i]))
+            rateChromosome <- length(perChromosomeIMD[i]) / chromosomeLength
         }
 
         resultsChromosome <- list(
