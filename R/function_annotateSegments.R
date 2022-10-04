@@ -1,5 +1,4 @@
 
-
 .annotateSegments <- function(changepointsPerChromosome, genomicVariantsAnnotated){
 
     # obtain results from changepoint analysis
@@ -57,9 +56,45 @@
     return(variants)
 }
 
+.addEmptySegments <- function(segments){
+
+    chromosomeNames <- levels(segments$seqnames)
+    chromosomesWithMutations <- unique(segments$seqnames)
+
+    # select chromosomes without any mutations in the sample
+    emptyChromosomes <- chromosomeNames[!chromosomeNames %in% chromosomesWithMutations]
+
+    if(length(emptyChromosomes) != 0){
+
+        # construct tibble for the empty chromosomes and fill in columns accordingly
+        segmentsInclEmpty <- tibble::tibble(
+            seqnames = emptyChromosomes,
+            segmentID = 1,
+            totalVariants = 0,
+            firstVariantID = NA,
+            lastVariantID = NA,
+            start = 1,
+            meanIMD = NA,
+            mutationRate = 0,
+            sampleNames = base::as.character(base::unique(segments$sampleNames))
+        ) |>
+            dplyr::rowwise() |>
+            dplyr::mutate(
+                end = getChromosomeLength(chromosome = base::unique(.data$seqnames))
+            ) |>
+            dplyr::ungroup() |>
+            dplyr::bind_rows(segments)
+
+    } else {
+        segmentsInclEmpty <- segments
+    }
+
+    return(segmentsInclEmpty)
+}
+
 determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
 
-    segments <- genomicVariantsAnnotated |>
+    segments <-  genomicVariantsAnnotated |>
         .addSegmentsIDtovariants(segmentIDs = segmentIDs) |>
         dplyr::group_by(.data$sampleNames, .data$seqnames, .data$segmentID) |>
         dplyr::summarise(
@@ -78,12 +113,30 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
             diff = base::ifelse(!base::is.na(dplyr::lag(.data$end)), .data$start - dplyr::lag(.data$end), 0),
             start = .data$start - .data$diff + 1,
             # make sure the first segment starts at the beginning of the sequence
-            start = c(1, .data$start[-1])
+            start = c(1, .data$start[-1]),
+            # make sure the last segment ends at the end of the sequence
+            end = c(.data$end[-base::length(.data$end)], getChromosomeLength(chromosome = base::unique(.data$seqnames)))
         ) |>
         dplyr::ungroup() |>
-        dplyr::mutate(mutationRate = rates) |>
+        # add the mutation rate of the segments
+        dplyr::mutate(
+            mutationRate = rates
+        ) |>
+        dplyr::group_by(.data$sampleNames, .data$seqnames) |>
+        # recalculate the mean IMD and rate of the last segment of each sequence (due to the added pseudo count during changepoint analysis)
+        dplyr::mutate(
+            meanIMD = c(
+                .data$meanIMD[-base::length(.data$meanIMD)],
+                (.data$end[base::length(.data$end)] - .data$start[base::length(.data$start)]) / .data$totalVariants[base::length(.data$totalVariants)]
+            ),
+            mutationRate = c(
+                .data$mutationRate[-base::length(.data$mutationRate)],
+                1 / .data$meanIMD[base::length(.data$meanIMD)])
+        ) |>
         dplyr::select(!diff) |>
-        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE)
+        .addEmptySegments() |>
+        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE) |>
+        GenomicRanges::sort()
 
     return(segments)
 }
