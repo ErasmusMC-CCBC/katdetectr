@@ -19,6 +19,3 @@
 
     return(genomicVariants)
 }
-
-
-# TODO add segment ID to genomic variants for easy filtering
