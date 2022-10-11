@@ -1,6 +1,6 @@
 Package: katdetectr
 Title: Detection, Characterization and Visualization of Kataegis in Sequencing Data
-Version: 0.99.15
+Version: 0.1.2 
 Authors@R: c(
     person("Daan", "Hazelaar", , "daanhazelaar@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7513-6813")),
@@ -12,7 +12,7 @@ Authors@R: c(
 Description: Kataegis refers to the occurrence of regional hypermutation and is
     a phenomenon observed in a wide range of malignancies. Using changepoint detection
     katdetectr aims to identify putative kataegis foci from common data-formats housing genomic variants.
-    Katdetectr has shown to be a robust package for the detection, characterization and visualisation of kataegis.
+    Katdetectr has shown to be a robust package for the detection, characterization and visualization of kataegis.
 License: GPL-3 + file LICENSE
 URL: https://github.com/ErasmusMC-CCBC/katdetectr
 BugReports: https://github.com/ErasmusMC-CCBC/katdetectr/issues
