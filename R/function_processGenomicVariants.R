@@ -22,7 +22,7 @@
     # If there are no overlapping variants, return original.
     # Otherwise, add a column that specifies which variants overlapped and were reduced.
     if(base::length(overlappingVariants) == 0){
-        variantsUnique <- genomicVariants
+        variantsUnique <- GenomicRanges::sort(genomicVariants)
     }else{
         # Add necessary columns for VRanges
         variantsUnique <- overlappingVariants |>

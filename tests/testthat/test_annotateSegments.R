@@ -36,6 +36,36 @@ testthat::test_that("test .annotateSegments():", {
 })
 
 
+testthat::test_that("test .addEmptySegments:", {
+
+    # this is quite a messy test but its more messy to construct a new segments input for .addEmptySegments()
+
+    # test on maf file
+    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+        .importGenomicVariants() |>
+        .processGenomicVariants() |>
+        .annotateGenomicVariants()
+
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::SerialParam())
+    segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
+
+    segmentsTest <- segmentsCPTAC |>
+        dplyr::as_tibble() |>
+        dplyr::slice(1:50)
+
+    emptySegmentsTest <- .addEmptySegments(segmentsTest)
+
+    testthat::expect_equal(nrow(emptySegmentsTest), 71)
+    testthat::expect_equal(emptySegmentsTest$seqnames[1], "chr3")
+    testthat::expect_equal(emptySegmentsTest$segmentID[10], 1)
+    testthat::expect_equal(emptySegmentsTest$totalVariants[11], 0)
+    testthat::expect_equal(emptySegmentsTest$firstVariantID[1], as.integer(NA))
+    testthat::expect_equal(emptySegmentsTest$lastVariantID[1], as.integer(NA))
+    testthat::expect_equal(emptySegmentsTest$start[15], 1)
+    testthat::expect_equal(emptySegmentsTest$meanIMD[15], as.integer(NA))
+    testthat::expect_equal(emptySegmentsTest$mutationRate[1], 0)
+})
+
 testthat::test_that("test .determineSegmentID:", {
 
     changepoints <- list(testSample1 = c(0 , 5, 43, 46, 52, 56), testSample2 = c(0, 5))

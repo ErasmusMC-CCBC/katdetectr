@@ -24,6 +24,6 @@ testthat::test_that("test .addIDsToVariants()", {
     testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[1], 1)
     testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[3634], 3)
     testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[3671], 3)
-    testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[3684], 7)
+    testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[3684], 6)
 
 })

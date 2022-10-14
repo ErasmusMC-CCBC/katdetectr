@@ -57,6 +57,42 @@
     return(variants)
 }
 
+.addEmptySegments <- function(segments){
+
+    chromosomeNames <- levels(segments$seqnames)
+    chromosomesWithMutations <- unique(segments$seqnames)
+
+    # select chromosomes without any mutations in the sample
+    emptyChromosomes <- chromosomeNames[!chromosomeNames %in% chromosomesWithMutations]
+
+    if(length(emptyChromosomes) != 0){
+
+        # construct tibble for the empty chromosomes and fill in columns accordingly
+        segmentsInclEmpty <- tibble::tibble(
+            seqnames = emptyChromosomes,
+            segmentID = 1,
+            totalVariants = 0,
+            firstVariantID = NA,
+            lastVariantID = NA,
+            start = 1,
+            meanIMD = NA,
+            mutationRate = 0,
+            sampleNames = base::as.character(base::unique(segments$sampleNames))
+        ) |>
+            dplyr::rowwise() |>
+            dplyr::mutate(
+                end = getChromosomeLength(chromosome = base::unique(.data$seqnames))
+            ) |>
+            dplyr::ungroup() |>
+            dplyr::bind_rows(segments)
+
+    } else {
+        segmentsInclEmpty <- segments
+    }
+
+    return(segmentsInclEmpty)
+}
+
 determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
 
     segments <- genomicVariantsAnnotated |>
@@ -83,7 +119,9 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
         dplyr::ungroup() |>
         dplyr::mutate(mutationRate = rates) |>
         dplyr::select(!diff) |>
-        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE)
+        .addEmptySegments() |>
+        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE) |>
+        GenomicRanges::sort()
 
     return(segments)
 }
