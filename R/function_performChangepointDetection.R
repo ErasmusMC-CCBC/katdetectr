@@ -107,7 +107,7 @@ getChromosomeLength <- function(chromosome){
             # For <4 observations, return first and last variant to set a single segment.
             changepointsChromosome <- c(0, (base::length(perChromosomeIMD[[i]])))
             # For <4 observations, the rate must be calculated manually. rate = nVariants / length of chromosome
-            rateChromosome <- length(perChromosomeIMD[i]) / getChromosomeLength(chromosome = names(perChromosomeIMD[i]))
+            rateChromosome <- length(perChromosomeIMD[[i]]) / getChromosomeLength(chromosome = names(perChromosomeIMD[i]))
         }
 
         resultsChromosome <- list(
