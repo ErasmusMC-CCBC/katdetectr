@@ -1,6 +1,6 @@
 Package: katdetectr
 Title: Detection, Characterization and Visualization of Kataegis in Sequencing Data
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(
     person("Daan", "Hazelaar", , "daanhazelaar@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7513-6813")),
@@ -53,5 +53,5 @@ VignetteBuilder:
 biocViews: WholeGenome, Software, SNP, Sequencing, Classification, VariantAnnotation
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Config/testthat/edition: 3

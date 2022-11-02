@@ -7,10 +7,11 @@
 detectKataegis(
   genomicVariants,
   minSizeKataegis = 6,
-  maxMeanIMD = 1000,
+  IMDcutoff = 1000,
   test.stat = "Exponential",
   penalty = "BIC",
   pen.value = 0,
+  method = "PELT",
   minseglen = 2,
   BPPARAM = BiocParallel::SerialParam(),
   aggregateRecords = FALSE
@@ -21,13 +22,15 @@ detectKataegis(
 
 \item{minSizeKataegis}{(integer): Minimal number of variants required within a segment for classification as a kataegis foci.}
 
-\item{maxMeanIMD}{(integer): Max. mean IMD within a segment for classification as a kataegis foci.}
+\item{IMDcutoff}{(numberic or function): When a numeric is supplied this represents the max mean IMD within a segment for classification as a kataegis foci. When a custom function is supplied by the user a IMD cutoff value is determined for each segment.}
 
 \item{test.stat}{(character): Distribution that is fitted to the data (Exponential or Empirical). See \link[changepoint]{cpt.meanvar}.}
 
 \item{penalty}{(character): Penalty used to guard against overfitting (BIC or Manual). See \link[changepoint]{cpt.meanvar}.}
 
 \item{pen.value}{(integer): Only needed for manual penalty. See \link[changepoint]{cpt.meanvar}.}
+
+\item{method}{(character): The search method used in changepoint analysis. Choice of: "PELT", "AMOC", "SegNeigh" or "BinSeg".}
 
 \item{minseglen}{(integer): Min. size of segments (no. of variants).}
 

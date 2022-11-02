@@ -1,11 +1,12 @@
-.getInfo <- function(genomicVariantsAnnotatedKat, segments, kataegisFoci, minSizeKataegis, maxMeanIMD, test.stat, penalty, pen.value, minseglen, aggregateRecords){
+.getInfo <- function(genomicVariantsAnnotatedKat, segments, kataegisFoci, minSizeKataegis, IMDcutoff, test.stat, penalty, pen.value, method, minseglen, aggregateRecords){
 
     parametersList <- base::list(
         minSizeKataegis = minSizeKataegis,
-        maxMeanIMD = maxMeanIMD,
+        IMDcutoff = IMDcutoff,
         test.stat = test.stat,
         penalty = penalty,
         pen.value = pen.value,
+        method = method,
         minseglen = minseglen,
         aggregateRecords = aggregateRecords
 
