@@ -1,13 +1,13 @@
 # TODO make sure that the final segments span the entire genome. Now the segments only span from the first to the last variant
 
-# this function fits a PCF model to the intermutations distances of each chromosome of each sample. The detected changepoints are returned
-.performChangepointDetection <- function(genomicVariantsAnnotated, test.stat, penalty, pen.value, minseglen, BPPARAM){
+# this function fits a model to the intermutations distances of each chromosome of each sample. The detected changepoints are returned
+.performChangepointDetection <- function(genomicVariantsAnnotated, test.stat, penalty, pen.value, method, minseglen, BPPARAM){
 
     # Split on chromosome and obtain IMD.
     perChromosomeIMD <- .getIMD(genomicVariantsAnnotated)
 
-    # Fit a PCF model to the IMD data and return the changepoints
-    changepoints <- .runCD(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, BPPARAM)
+    # Fit model to the IMD data and return the changepoints
+    changepoints <- .runCD(perChromosomeIMD, test.stat, penalty, pen.value, method, minseglen, BPPARAM)
 
     return(changepoints)
 }
@@ -67,10 +67,10 @@ getChromosomeLength <- function(chromosome){
 }
 
 # Helper - Perform changepoint detection. ----
-.runCD <- function(perChromosomeIMD, test.stat, penalty, pen.value, minseglen, BPPARAM){
+.runCD <- function(perChromosomeIMD, test.stat, penalty, pen.value, method, minseglen, BPPARAM){
 
     # loop over the elements of perChromosomeIMD. Normal map is not possible as the names of the list must be available in the function body
-    changepointsPerChromosome <- BiocParallel::bplapply(seq(perChromosomeIMD), function(i, .test.stat = test.stat, .penalty = penalty, .pen.value = pen.value, .minseglen = minseglen, .BPPARAM = BPPARAM){
+    changepointsPerChromosome <- BiocParallel::bplapply(seq(perChromosomeIMD), function(i, .test.stat = test.stat, .penalty = penalty, .pen.value = pen.value, .method = method, .minseglen = minseglen, .BPPARAM = BPPARAM){
 
         # At least 4 observations (IMDs) are needed for changepoint analysis.
         if(base::length(perChromosomeIMD[[i]]) >= 4){
@@ -80,7 +80,7 @@ getChromosomeLength <- function(chromosome){
                     data = perChromosomeIMD[[i]],
                     penalty = .penalty,
                     pen.value = .pen.value,
-                    method = 'PELT',
+                    method = .method,
                     test.stat = 'Exponential',
                     class = TRUE,
                     minseglen = .minseglen

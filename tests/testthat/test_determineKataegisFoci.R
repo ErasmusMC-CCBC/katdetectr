@@ -1,13 +1,47 @@
-testthat::test_that("test .determineKataegisFoci()", {
+testthat::test_that("test .determineKataegisFoci(IMDcutoff = fun())", {
 
     # test on larger breast cancer sample
     genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
         .importGenomicVariants() |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
-    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::SerialParam())
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
-    kataegisFociCPTAC <- .determineKataegisFoci(segments = segmentsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, maxMeanIMD = 1000)
+
+    modelSampleRate <- function(IMDs){
+
+        lambda <- log(2) / median(IMDs)
+
+        return(lambda)
+    }
+
+
+    nthroot = function(x, n){
+
+        y <- x^(1 / n)
+
+        return(y)
+    }
+
+
+    IMDcutoffFun <- function(genomicVariantsAnnotated, segments){
+
+        IMDs <- genomicVariantsAnnotated$IMD
+        totalVariants <-  segments$totalVariants
+        width <- segments |> dplyr::as_tibble() |> dplyr::pull(width)
+
+        sampleRate <- modelSampleRate(IMDs)
+
+        IMDthreshold <- -log(1 - nthroot(0.01 / width, totalVariants - 1)) / sampleRate
+
+        IMDthreshold <- replace(IMDthreshold, IMDthreshold > 1000, 1000)
+
+        return(IMDthreshold)
+    }
+
+    IMDcutoffValues <- .determineIMDcutoffValues(IMDcutoffFun, genomicVariantsAnnotatedCPTAC,  segmentsCPTAC)
+    segmentsCPTAC <- .addIMDcutoffValuesToSegments(segmentsCPTAC, IMDcutoffValues)
+    kataegisFociCPTAC <- .determineKataegisFoci(segmentsCPTAC, genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, IMDcutoff = IMDcutoffValues)
 
     testthat::expect_equal(base::length(kataegisFociCPTAC), 14)
     testthat::expect_equal(kataegisFociCPTAC$fociID[1], 1)
@@ -16,6 +50,30 @@ testthat::test_that("test .determineKataegisFoci()", {
     testthat::expect_equal(kataegisFociCPTAC$firstVariantID[1], 363)
     testthat::expect_equal(kataegisFociCPTAC$lastVariantID[1], 367)
     testthat::expect_equal(round(kataegisFociCPTAC$meanIMD[1]), 247)
+    testthat::expect_equal(round(kataegisFociCPTAC$IMDcutoff[1]), 1000)
+})
+
+testthat::test_that("test .determineKataegisFoci(IMDcutoff = 1000)", {
+
+    # test on larger breast cancer sample
+    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+        .importGenomicVariants() |>
+        .processGenomicVariants() |>
+        .annotateGenomicVariants()
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
+    segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
+    IMDcutoffValues <- .determineIMDcutoffValues(1000, genomicVariantsAnnotatedCPTAC,  segmentsCPTAC)
+    segmentsCPTAC <- .addIMDcutoffValuesToSegments(segmentsCPTAC, IMDcutoffValues)
+    kataegisFociCPTAC <- .determineKataegisFoci(segmentsCPTAC, genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, IMDcutoff = IMDcutoffValues)
+
+    testthat::expect_equal(base::length(kataegisFociCPTAC), 14)
+    testthat::expect_equal(kataegisFociCPTAC$fociID[1], 1)
+    testthat::expect_equal(kataegisFociCPTAC$sampleNames[1], "CPTAC")
+    testthat::expect_equal(kataegisFociCPTAC$totalVariants[1], 5)
+    testthat::expect_equal(kataegisFociCPTAC$firstVariantID[1], 363)
+    testthat::expect_equal(kataegisFociCPTAC$lastVariantID[1], 367)
+    testthat::expect_equal(round(kataegisFociCPTAC$meanIMD[1]), 247)
+    testthat::expect_equal(round(kataegisFociCPTAC$IMDcutoff[1]), 1000)
 })
 
 testthat::test_that("test .annotateKataegisSegments()", {
@@ -38,7 +96,7 @@ testthat::test_that("test .annotateKataegisSegments()", {
         lastVariantID = c(11, 26, 526, 528, 539, 652)
     )
 
-    katSegs <- .determineKataegisSegments(segments = testSegments, maxMeanIMD = 1000)
+    katSegs <- .determineKataegisSegments(segments = testSegments, IMDcutoff = 1000)
     katSegsMerged <- .mergeKataegisSegments(kataegisSegments = katSegs, minSizeKataegis = 4)
     katSegsAnno <- .annotateKataegisSegments(kataegisFoci = katSegsMerged, genomicVariantsAnnotated = testVariants)
 
@@ -66,7 +124,7 @@ testthat::test_that("test .mergeKataegisSegments()", {
         lastVariantID = c(11, 26, 526, 528,539, 650)
     )
 
-    katSegs <- .determineKataegisSegments(segments = testSegments, maxMeanIMD = 1000)
+    katSegs <- .determineKataegisSegments(segments = testSegments, IMDcutoff = 1000)
     katSegsMerged <- .mergeKataegisSegments(kataegisSegments = katSegs, minSizeKataegis = 4)
 
     testthat::expect_equal(base::nrow(katSegsMerged), 2)
@@ -89,7 +147,7 @@ testthat::test_that("test .determineKataegisSegments()", {
         sampleNames = c("testSample", "testSample", "testSample", "testSample", "testSample", "testSample")
     )
 
-    katSegs <- .determineKataegisSegments(segments = testSegments, maxMeanIMD = 1000)
+    katSegs <- .determineKataegisSegments(segments = testSegments, IMDcutoff = 1000)
 
     testthat::expect_equal(base::nrow(katSegs), 3)
     testthat::expect_equal(katSegs$meanIMD[1], 1000)

@@ -40,11 +40,11 @@ The general workflow of `katdetectr` can be summarized as follows:
 2. Detection of kataegis foci.
 3. Visualization of segmentation and kataegis foci.
 
-Please see the Application Note (under submission) for additional background and details of `katdetectr`. The application note also section regarding the performance of `katdetectr` and other kataegis detection packages: [maftools](https://bioconductor.org/packages/release/bioc/html/maftools.html), [ClusteredMutations](https://cran.r-project.org/web/packages/ClusteredMutations/index.html), [SeqKat](https://cran.r-project.org/web/packages/SeqKat/index.html), [kataegis](https://github.com/flosalbizziae/kataegis), and [SigProfilerClusters](https://github.com/AlexandrovLab/SigProfilerClusters).
+Please see the [Application Note](https://www.biorxiv.org/content/10.1101/2022.07.11.499364v1) (under submission) for additional background and details of `katdetectr`. The application note also contains a section regarding the performance of `katdetectr` and other kataegis detection packages: [maftools](https://bioconductor.org/packages/release/bioc/html/maftools.html), [ClusteredMutations](https://cran.r-project.org/web/packages/ClusteredMutations/index.html), [SeqKat](https://cran.r-project.org/web/packages/SeqKat/index.html), [kataegis](https://github.com/flosalbizziae/kataegis), and [SigProfilerClusters](https://github.com/AlexandrovLab/SigProfilerClusters).
 
-We have made `katdetectr` available on *BioConductor* as this insures reliability, and operability on common operation systems (Linux, Mac, and Windows).
+We have made `katdetectr` available on *BioConductor* as this insures reliability, and operability on common operating systems (Linux, Mac, and Windows). We designed `katdetectr` such that it fits well in the *BioConductor* ecosystem which allows `katdetectr` to be used easily in combination with other *BioConductor* packages and analysis pipelines.
 
-Below, the `katdetectr` workflow is performed in a step-by-step manner on publicly-available datasets which are included within this package.
+Below, the `katdetectr` workflow is performed in a step-by-step manner on publicly-available datasets that are included within this package.
 
 
 # Importing genomic variants
@@ -57,8 +57,8 @@ pathToVCF <- system.file(package = "katdetectr", "extdata/CPTAC_Breast.vcf")
 # Genomic variants stored within the MAF format.
 pathToMAF <- system.file(package = "katdetectr", "extdata/APL_primary.maf")
 
-# In addition, we can generate synthetic genomic variants including kataegis foci.
-# using generateSyntheticData(). This will output a VRanges object.
+# In addition, we can generate synthetic genomic variants including kataegis foci using generateSyntheticData(). 
+# This functions returns a VRanges object.
 syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci = 1)
 ```
 
@@ -66,9 +66,9 @@ syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci
 
 Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying IMD and size.
 
-Imported samples can contain either single or multiple samples, in which case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
+Imported genomic variant data can contain either single or multiple samples, in the latter case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
 
-From the genomic variants data, we calculate the intermutation distance (IMD). The IMD is defined as the genomic distance (in bp) between a genomic variant and it's respective nearest upstream genomic variant (5' A <- B 3'). Following, changepoint analysis is performed on the IMD of the genomic variants which results in segments. Lastly, a segment is labelled as *kataegis foci* if the segment fits the following parameters: ` minSizeKataegis = 6` and `maxMeanIMD = 1000`.
+From the genomic variants data, we calculate the intermutation distance (IMD). The IMD is defined as the genomic distance (in bp) between a genomic variant and it's respective nearest upstream genomic variant (5' A <- B 3'). Following, changepoint analysis is performed on the IMD of the genomic variants which results in segments. Lastly, a segment is labelled as *kataegis foci* if the segment fits the following parameters: ` minSizeKataegis = 6` and `IMDcutoff = 1000`.
 ```{r, label = 'Detection of kataegis foci', eval = TRUE}
 # Detect kataegis foci within the given VCF file.
 kdVCF <- detectKataegis(genomicVariants = pathToVCF)
@@ -98,7 +98,7 @@ Underlying data can be retrieved from a `KatDetect` objects using the following 
 
 1. `getGenomicVariants()` returns: VRanges object. Processed genomic variants used as input for changepoint detection. This VRanges contains the genomic        location, IMD, and kataegis status of each genomic variant
 2. `getSegments()` returns: GRanges object. Contains the segments as derived from changepoint detection. This Granges contains the genomic location, total      number of variants, mean IMD and, mutation rate of each segment.
-3. `getKataegisFoci()` returns: GRanges object. Contains all segments designated as putative kataegis foci according the the specified parameters               (minSizeKataegis and maxMeanIMD). This Granges contains the genomic location, total number of variants and mean IMD of each putative kataegis foci
+3. `getKataegisFoci()` returns: GRanges object. Contains all segments designated as putative kataegis foci according the the specified parameters               (minSizeKataegis and IMDcutoff). This Granges contains the genomic location, total number of variants and mean IMD of each putative kataegis foci
 4. `getInfo()` returns: List object. Contains supplementary information including used parameter settings.
 
 
@@ -134,7 +134,7 @@ rainfallPlot(kdSynthetic, showKataegis = TRUE, showSegmentation = TRUE, showSequ
 
 # More parameter settings
 
-`katdetectr` has been implemented flexibly which allows its users to detect clustered mutations of different classes. The historical definition of kataegis foci is a segment harboring ≥6 variants and has a mean IMD ≤1000bp. However, these parameters can be set differently in `detectKataegis()`. 
+`katdetectr` has been implemented flexibly which allows its users to detect clustered mutations of different classes. The historical definition of kataegis foci, [postulated by Alexandrov et al.*](https://www.nature.com/articles/nature12477) is a segment harboring ≥6 variants and has a mean IMD ≤1000bp. However, these parameters can be set differently in `detectKataegis()`. 
 
 For example, other classes of mutation are:
 
@@ -146,20 +146,59 @@ Note that we did not evaluate the performance of `katdetectr` in regards to dete
 
 ```{r}
 # detect putative DBS
-kdSyntheticDBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 2, maxMeanIMD = 0)
+kdSyntheticDBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 2, IMDcutoff = 0)
 
 # detect putative MBS, size = 3
-kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 0)
+kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, IMDcutoff = 0)
 
 # detect putative Omikli, size 3 and mean IMD = 500
-kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, maxMeanIMD = 500)
+kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, IMDcutoff = 500)
 ```
 
 
-We tested katdetectr with multiple parameter settings (test.stat, penalty, pen.value, minseglen) in order to obtain the highest performance in regards to kataegis classification. The best combination of parameters have been set as the default values. We recommend using these parameter settings!
+We tested katdetectr with multiple parameter settings (test.stat, penalty, pen.value, minseglen) in order to obtain the highest performance in regards to kataegis classification. The best combination of parameters have been set as the default values. We recommend using these parameter settings! For more information regarding the these parameters for changepoint analysis see [Killick2014](https://www.jstatsoft.org/article/view/v058i03)
 
-If your interested you can play with different parameters settings. All these parameters are passed directly to the changepoint or changepoint.np package. For more information regarding these packages see [Killick2014](https://www.jstatsoft.org/article/view/v058i03) or [Haynes2016](https://link.springer.com/article/10.1007/s11222-016-9687-5)
 
+
+# Custom function for IMD cutoff value. 
+
+As show previously, the IMD cutoff value can be set by the user in order to identify different types of mutation clusters. However, it is also possible to define a custom function that determines a IMD cutoff value for each detected segment. This flexibility allow you to define your own kataegis definition while still using the `katdetectr` framework. Below we show how to implement a custom function for the IMD cutoff value. The function below comes from the work of [Pan-Cancer Analysis of Whole Genomes Consortium](https://www.nature.com/articles/s41586-020-1969-6#citeas)
+```{r}
+# function for modeling sample mutation rate
+modelSampleRate <- function(IMDs){
+    
+    lambda <- log(2) / median(IMDs)
+    
+    return(lambda)
+}
+
+# function for calculating the nth root of x
+nthroot = function(x, n){
+    
+    y <- x^(1 / n)
+    
+    return(y)
+}
+
+# Function that defines the IMD cutoff specific for each segment
+# Within this function you can use all variables available in the slots: genomicVariants and segments
+IMDcutoffFun <- function(genomicVariants, segments){
+    
+    IMDs <- genomicVariants$IMD
+    totalVariants <-  segments$totalVariants
+    width <- segments |> dplyr::as_tibble() |> dplyr::pull(width)
+    
+    sampleRate <- modelSampleRate(IMDs)
+    
+    IMDcutoff <- -log(1 - nthroot(0.01 / width, totalVariants - 1)) / sampleRate
+    
+    IMDcutoff <- replace(IMDcutoff, IMDcutoff > 1000, 1000)
+    
+    return(IMDcutoff)
+}
+
+kdCustom <- detectKataegis(syntheticData, IMDcutoff = IMDcutoffFun)
+```
 
 
 # Session Information

@@ -5,9 +5,9 @@ testthat::test_that("test .addIDsToVariants()", {
         .importGenomicVariants() |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
-    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, minseglen = 2, BPPARAM = BiocParallel::SerialParam())
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
-    kataegisFociCPTAC <- .determineKataegisFoci(segments = segmentsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, maxMeanIMD = 1000)
+    kataegisFociCPTAC <- .determineKataegisFoci(segments = segmentsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, IMDcutoff = 1000)
     genomicVariantsAnnotatedCPTACkat <- .addIDsToVariants(kataegisFoci = kataegisFociCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, changepointsPerChromosome = changepointsCPTAC)
 
     testthat::expect_equal(base::length(genomicVariantsAnnotatedCPTACkat), 3684)

@@ -1,18 +1,19 @@
-.determineKataegisFoci <- function(segments, genomicVariantsAnnotated, minSizeKataegis, maxMeanIMD){
+.determineKataegisFoci <- function(segments, genomicVariantsAnnotated, minSizeKataegis, IMDcutoffValues){
 
     kataegisFoci <- segments |>
-        .determineKataegisSegments(maxMeanIMD = maxMeanIMD) |>
+        .determineKataegisSegments(IMDcutoffValues = IMDcutoffValues) |>
         .mergeKataegisSegments(minSizeKataegis = minSizeKataegis) |>
         .annotateKataegisSegments(genomicVariantsAnnotated = genomicVariantsAnnotated)
 
     return(kataegisFoci)
 }
 
-.determineKataegisSegments <- function(segments, maxMeanIMD){
+.determineKataegisSegments <- function(segments, IMDcutoffValues){
 
     selectedSegments <- segments |>
         tibble::as_tibble() |>
-        dplyr::filter(.data$meanIMD <= maxMeanIMD) |>
+        dplyr::mutate(IMDcutoff = {{IMDcutoffValues}}) |>
+        dplyr::filter(.data$meanIMD <= .data$IMDcutoff) |>
         dplyr::group_by(.data$seqnames)
 
     return(selectedSegments)
@@ -48,7 +49,8 @@
                 totalVariants = base::sum(.data$totalVariants),
                 firstVariantID = base::min(.data$firstVariantID),
                 lastVariantID = base::max(.data$lastVariantID),
-                meanIMD = base::mean(.data$meanIMD)
+                meanIMD = base::mean(.data$meanIMD),
+                IMDcutoff = base::unique(.data$IMDcutoff)
             ) |>
             dplyr::ungroup() |>
             dplyr::filter(.data$totalVariants >= minSizeKataegis - 1)
