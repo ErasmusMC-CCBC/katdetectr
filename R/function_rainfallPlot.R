@@ -145,11 +145,11 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
 
         # Options - Axis.
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
-        ggplot2::scale_y_continuous(
-            trans = scales::pseudo_log_trans(),
-            breaks = c(-1, 0, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
-            labels = c('NA','0bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
-            expand = c(0, 0)) +
+        # ggplot2::scale_y_continuous(
+        #     trans = scales::pseudo_log_trans(),
+        #     breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
+        #     labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
+        #     expand = c(0, 0)) +
 
         ggplot2::labs(y = 'IMD') +
 
@@ -174,29 +174,49 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
             strip.background = ggplot2::element_blank(),
             legend.key = ggplot2::element_blank(),
             strip.text = ggplot2::element_text(angle = 60)
-        )
+        ) +
 
-    # Highlight kataegis foci.
-    if(showKataegis & base::nrow(plotDataKataegis) != 0){
-        p <- p + ggplot2::geom_rect(
-            data = plotDataKataegis,
-            inherit.aes = FALSE,
-            ggplot2::aes(xmin = .data$firstVariantID, xmax = .data$lastVariantID, ymin = -1, ymax = Inf, group = .data$seqnames),
-            fill = '#0080FF30')
-    }
+        {if(showSegmentation)
+            ggplot2::scale_y_continuous(
+                trans = scales::pseudo_log_trans(),
+                breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
+                labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
+                expand = c(0, 0),
+                sec.axis = ggplot2::sec_axis(
+                    trans = ~ 1 / .,
+                    name = "Mutation rate",
+                    breaks = c(1, 0.1, 0.01, 0.001, 1E-4, 1E-5, 1E-6, 1E-7, 1E-8),
+                    labels = c("1", "0.1", "0.01", "1E-4", "1E-5", "1E-6", "1E-7", "1E-8", "1E-9")
+                ))
+        } +
 
-    # show means and segments
-    if(showSegmentation){
-        p <- p +
+        {if(showSegmentation)
             ggplot2::geom_segment(
                 data = plotDataSegments,
                 mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$lastVariantID + 1, y = .data$meanIMD, yend = .data$meanIMD),
-                col = 'black', lty = 'solid', na.rm = TRUE) +
+                col = 'black', lty = 'solid', na.rm = TRUE)
+        } +
+
+        {if(showSegmentation)
             ggplot2::geom_segment(
                 data = plotDataSegments,
-                mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$firstVariantID, y = -1,yend = Inf),
+                mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$firstVariantID, y = 0, yend = Inf),
                 col = 'black', lty = 'dotted')
-    }
+        } +
+
+        {if(!showSegmentation) ggplot2::scale_y_continuous(
+            trans = scales::pseudo_log_trans(),
+            breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
+            labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
+            expand = c(0, 0))
+        } +
+
+        {if(showKataegis & base::nrow(plotDataKataegis) != 0) ggplot2::geom_rect(
+            data = plotDataKataegis,
+            inherit.aes = FALSE,
+            ggplot2::aes(xmin = .data$firstVariantID, xmax = .data$lastVariantID, ymin = 0, ymax = Inf, group = .data$seqnames),
+            fill = '#0080FF30')
+        }
 
     return(p)
 }

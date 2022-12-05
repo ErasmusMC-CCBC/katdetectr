@@ -26,7 +26,9 @@
 
         # label variants that are not in a detected kataegis foci
         noKataegisVariants <- genomicVariantsAnnotated[-kataegisVariants$variantID]
-        noKataegisVariants$putativeKataegis <- FALSE
+        if(length(noKataegisVariants) != 0){
+            noKataegisVariants$putativeKataegis <- FALSE
+        }
 
         # update variants
         genomicVariantsAnnotated <- GenomicRanges::sort(c(kataegisVariants, noKataegisVariants))

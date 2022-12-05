@@ -2,7 +2,7 @@
 testthat::test_that("test .annotateGenomicVariants:", {
 
     genomicVariantsAnnotated <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
-        .importGenomicVariants() |>
+        .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
 

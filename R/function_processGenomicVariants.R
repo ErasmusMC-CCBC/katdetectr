@@ -1,28 +1,28 @@
 # Internal - Clean-up genomic variants prior to analysis. ----
-.processGenomicVariants <-  function(genomicVariants){
+.processGenomicVariants <-  function(genomicVariantsImported){
 
     # Reduce overlapping variants.
-    genomicVariantsReduced <- .reduceOverlappingVariants(genomicVariants)
+    genomicVariantsProcessed <- .reduceOverlappingVariants(genomicVariantsImported)
 
-    return(genomicVariantsReduced)
+    return(genomicVariantsProcessed)
 }
 
 
-.reduceOverlappingVariants <- function(genomicVariants){
+.reduceOverlappingVariants <- function(genomicVariantsImported){
 
     # Reduce overlapping mutations to a single range.
-    variantsReduced <- GenomicRanges::reduce(genomicVariants, min.gapwidth = 0, ignore.strand = TRUE,  with.revmap = TRUE)
+    variantsReduced <- GenomicRanges::reduce(genomicVariantsImported, min.gapwidth = 0, ignore.strand = TRUE,  with.revmap = TRUE)
 
     # Select variants that (partially) overlap with another variant.
     overlappingVariants <- variantsReduced[S4Vectors::elementNROWS(variantsReduced$revmap) != 1,]
 
     # Select variants that do not overlap with other variants.
-    nonOverlappingVariants <- genomicVariants[-base::unlist(overlappingVariants$revmap)]
+    nonOverlappingVariants <- genomicVariantsImported[-base::unlist(overlappingVariants$revmap)]
 
     # If there are no overlapping variants, return original.
     # Otherwise, add a column that specifies which variants overlapped and were reduced.
     if(base::length(overlappingVariants) == 0){
-        variantsUnique <- GenomicRanges::sort(genomicVariants)
+        variantsUnique <- GenomicRanges::sort(genomicVariantsImported)
     }else{
         # Add necessary columns for VRanges
         variantsUnique <- overlappingVariants |>
@@ -30,7 +30,7 @@
             dplyr::mutate(
                 ref = 'X',
                 alt = 'XX',
-                sampleNames = base::unique(VariantAnnotation::sampleNames(genomicVariants))
+                sampleNames = base::unique(VariantAnnotation::sampleNames(genomicVariantsImported))
             ) |>
             # join non with  overlapping variants
             dplyr::bind_rows(tibble::as_tibble(nonOverlappingVariants)) |>
@@ -47,6 +47,9 @@
     variantsUnique$revmap <- variantsReduced$revmap
 
     variantsUnique <- GenomicRanges::sort(variantsUnique)
+
+    # drop unused levels
+    GenomeInfoDb::seqlevels(variantsUnique) <- GenomeInfoDb::seqlevelsInUse(variantsUnique)
 
     return(variantsUnique)
 }

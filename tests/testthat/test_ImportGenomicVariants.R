@@ -2,7 +2,7 @@ testthat::test_that("test .importGenomicVariants():", {
 
     testthat::expect_error(.importGenomicVariants(system.file('extdata', 'APL_primary.maf', package = 'katdetectr')))
 
-    vrCPTAC <- .importGenomicVariants(system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr'))
+    vrCPTAC <- .importGenomicVariants(system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr'), refSeq = "hg19")
 
     testthat::expect_s4_class(vrCPTAC, "VRanges")
     testthat::expect_equal(base::length(vrCPTAC), 3687)

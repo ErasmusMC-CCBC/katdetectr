@@ -1,5 +1,5 @@
 
-.annotateSegments <- function(changepointsPerChromosome, genomicVariantsAnnotated){
+.annotateSegments <- function(changepointsPerChromosome, genomicVariantsAnnotated, refSeq){
 
     # obtain results from changepoint analysis
     changepoints <- .getChangepoints(changepointsPerChromosome)
@@ -9,7 +9,7 @@
     segmentIDs <- .determineSegmentID(changepoints)
 
     # determine the segments and calculate additional info for each segment
-    segments <- determineSegments(genomicVariantsAnnotated, segmentIDs, rates)
+    segments <- determineSegments(genomicVariantsAnnotated, segmentIDs, rates, refSeq)
 
     return(segments)
 }
@@ -56,7 +56,7 @@
     return(variants)
 }
 
-.addEmptySegments <- function(segments){
+.addEmptySegments <- function(segments, refSeq){
 
     chromosomeNames <- levels(segments$seqnames)
     chromosomesWithMutations <- unique(segments$seqnames)
@@ -80,7 +80,7 @@
         ) |>
             dplyr::rowwise() |>
             dplyr::mutate(
-                end = getChromosomeLength(chromosome = base::unique(.data$seqnames))
+                end = getChromosomeLength(chromosome = base::unique(.data$seqnames), refSeq)
             ) |>
             dplyr::ungroup() |>
             dplyr::bind_rows(segments)
@@ -92,7 +92,7 @@
     return(segmentsInclEmpty)
 }
 
-determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
+determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates, refSeq){
 
     segments <-  genomicVariantsAnnotated |>
         .addSegmentsIDtovariants(segmentIDs = segmentIDs) |>
@@ -115,7 +115,7 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
             # make sure the first segment starts at the beginning of the sequence
             start = c(1, .data$start[-1]),
             # make sure the last segment ends at the end of the sequence
-            end = c(.data$end[-base::length(.data$end)], getChromosomeLength(chromosome = base::unique(.data$seqnames)))
+            end = c(.data$end[-base::length(.data$end)], getChromosomeLength(chromosome = as.character(base::unique(.data$seqnames)), refSeq))
         ) |>
         dplyr::ungroup() |>
         # add the mutation rate of the segments
@@ -134,7 +134,7 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates){
                 1 / .data$meanIMD[base::length(.data$meanIMD)])
         ) |>
         dplyr::select(!diff) |>
-        .addEmptySegments() |>
+        .addEmptySegments(refSeq) |>
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE) |>
         GenomicRanges::sort()
 

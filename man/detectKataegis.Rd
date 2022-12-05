@@ -6,6 +6,7 @@
 \usage{
 detectKataegis(
   genomicVariants,
+  refSeq = "hg19",
   minSizeKataegis = 6,
   IMDcutoff = 1000,
   test.stat = "Exponential",
@@ -19,6 +20,8 @@ detectKataegis(
 }
 \arguments{
 \item{genomicVariants}{(\link[VariantAnnotation]{VRanges}, VCF or MAF): VRanges, or path to VCF or MAF file containing genomic variants.}
+
+\item{refSeq}{(character or data.frame): The used reference genome for variant calling. Choose: "hg19" or "hg38". For analysis of non standard sequences: provide a data.frame containing the length of the sequences.}
 
 \item{minSizeKataegis}{(integer): Minimal number of variants required within a segment for classification as a kataegis foci.}
 

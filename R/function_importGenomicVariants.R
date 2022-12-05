@@ -1,13 +1,6 @@
 # Internal - Import supplied genomic variants. ----
 
-.importGenomicVariants <- function(x, aggregateRecords){
-
-    # Input validation ----
-
-    checkmate::assert(
-        checkmate::checkClass(x, "VRanges"),
-        checkmate::checkAccess(x, access = 'r')
-    )
+.importGenomicVariants <- function(x, aggregateRecords, refSeq){
 
     # Check type of provided data and import accordingly. ----
     if(methods::is(x, 'VRanges')){
@@ -23,19 +16,33 @@
             base::stop('Provide a VRanges object or path to MAF or VCF file (extension: vcf, vcf.gz, maf, maf.gz)')
         )}
 
-    # Check multiple samples. ----
+    # Check multiple samples
     if(base::length(base::unique(Biobase::sampleNames(genomicVariants))) != 1){
         if(!aggregateRecords){
-            base::stop('Your genomic variant data contains multiple sample names, select only a single sample to avoid overlapping mutations!
-            I.e. pre-filter as a VRanges or set aggregateRecords = TRUE')
+            base::stop('Your genomic variant data contains multiple sample names. Provide data from a single sample or set aggregateRecords = TRUE')
         }else{
             Biobase::sampleNames(genomicVariants) <- base::paste(base::unique(Biobase::sampleNames(genomicVariants)), collapse = ', ')
             genomicVariants <- IRanges::unique(genomicVariants)
         }
     }
 
+    # check for non standard sequences
+    seqLev <- GenomeInfoDb::seqlevelsInUse(genomicVariants)
+    allStandardSeqlev <- seqLev %in% paste0(rep("chr", 24), c(1:25, "X", "Y", "M"))
+    seqLevNonStandard <- seqLev[!allStandardSeqlev]
+    seqLevInTib <- seqLev %in% names(refSeq)
+
+    if(!all(allStandardSeqlev) & !all(seqLevInTib)){
+        base::stop(base::paste0(c("Your genomic variant data contains the following non standard sequences:",
+                                  seqLevNonStandard,
+                                  "Please check the vignette on how to deal with non standard sequences."
+        ),
+        collapse = " "))
+    }
+
     return(genomicVariants)
 }
+
 
 # Helper - Coerce VCF into VRanges. ----
 .coerceVCFtoVRanges <- function(path = NULL){

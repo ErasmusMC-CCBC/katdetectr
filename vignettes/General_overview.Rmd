@@ -67,11 +67,11 @@ syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci
 
 # Detection of kataegis foci
 
-Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying IMD and size.
+Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying intermutation distance (IMD) , mutation rate and size.
 
 Imported genomic variant data can contain either single or multiple samples, in the latter case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
 
-From the genomic variants data, we calculate the intermutation distance (IMD). The IMD is defined as the genomic distance (in bp) between a genomic variant and it's respective nearest upstream genomic variant (5' A <- B 3'). Following, changepoint analysis is performed on the IMD of the genomic variants which results in segments. Lastly, a segment is labelled as *kataegis foci* if the segment fits the following parameters: ` minSizeKataegis = 6` and `IMDcutoff = 1000`.
+From the genomic variants data the IMD is calculated. Following, changepoint analysis is performed on the IMD of the genomic variants which results in segments. Lastly, a segment is labelled as *kataegis foci* if the segment fits the following parameters: ` minSizeKataegis = 6` and `IMDcutoff = 1000`.
 ```{r, label = 'Detection of kataegis foci', eval = TRUE}
 # Detect kataegis foci within the given VCF file.
 kdVCF <- detectKataegis(genomicVariants = pathToVCF)
@@ -193,7 +193,7 @@ IMDcutoffFun <- function(genomicVariants, segments){
     
     sampleRate <- modelSampleRate(IMDs)
     
-    IMDcutoff <- -log(1 - nthroot(0.01 / width, totalVariants - 1)) / sampleRate
+    IMDcutoff <- -log(1 - nthroot(0.01 / width, ifelse(totalVariants != 0, totalVariants - 1, 1))) / sampleRate
     
     IMDcutoff <- replace(IMDcutoff, IMDcutoff > 1000, 1000)
     
@@ -201,6 +201,29 @@ IMDcutoffFun <- function(genomicVariants, segments){
 }
 
 kdCustom <- detectKataegis(syntheticData, IMDcutoff = IMDcutoffFun)
+```
+
+
+# Analyzing non standard sequences
+
+The human autosomes and sex chromosomes from the reference genome hg19 and hg38 come implemented in `katdetectr`. However, other (non standard) sequences can be analyzed if the correct arguments are provided. You have to provide a dataframe that contains the length of all the sequences you want to analyze.
+
+```{r}
+# generate data that contains non standard sequences
+syndata1 <- generateSyntheticData(seqnames = c("chr1_gl000191_random", "chr4_ctg9_hap1"))
+syndata2 <- generateSyntheticData(seqnames = "chr1")
+syndata <- suppressWarnings(c(syndata1, syndata2))
+
+# construct a dataframe that contains the length of the sequences
+# each column name (name of the sequence)
+sequenceLength = data.frame(
+    chr1 = 249250621,
+    chr1_gl000191_random = 106433,
+    chr4_ctg9_hap1 = 590426
+)
+
+# provide the dataframe with the sequence lengths using the refSeq argument
+kdNonStandard <- detectKataegis(genomicVariants = syndata, refSeq = sequenceLength)
 ```
 
 

@@ -2,7 +2,7 @@
 testthat::test_that("test .reduceOverlappingVariants()", {
 
     vrReduced <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
-        .importGenomicVariants() |>
+        .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants()
 
     testthat::expect_equal(base::length(vrReduced), 3684)

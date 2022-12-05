@@ -2,11 +2,11 @@ testthat::test_that("test .determineKataegisFoci(IMDcutoff = fun())", {
 
     # test on larger breast cancer sample
     genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
-        .importGenomicVariants() |>
+        .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
-    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
-    segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19", test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
+    segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19")
 
     modelSampleRate <- function(IMDs){
 
@@ -32,7 +32,7 @@ testthat::test_that("test .determineKataegisFoci(IMDcutoff = fun())", {
 
         sampleRate <- modelSampleRate(IMDs)
 
-        IMDthreshold <- -log(1 - nthroot(0.01 / width, totalVariants - 1)) / sampleRate
+        IMDthreshold <- -log(1 - nthroot(0.01 / width, ifelse(totalVariants != 0, totalVariants - 1, 1))) / sampleRate
 
         IMDthreshold <- replace(IMDthreshold, IMDthreshold > 1000, 1000)
 
@@ -57,11 +57,11 @@ testthat::test_that("test .determineKataegisFoci(IMDcutoff = 1000)", {
 
     # test on larger breast cancer sample
     genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
-        .importGenomicVariants() |>
+        .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
-    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
-    segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC)
+    changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19", test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
+    segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19")
     IMDcutoffValues <- .determineIMDcutoffValues(1000, genomicVariantsAnnotatedCPTAC,  segmentsCPTAC)
     segmentsCPTAC <- .addIMDcutoffValuesToSegments(segmentsCPTAC, IMDcutoffValues)
     kataegisFociCPTAC <- .determineKataegisFoci(segmentsCPTAC, genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, IMDcutoff = IMDcutoffValues)

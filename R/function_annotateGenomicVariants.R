@@ -1,7 +1,7 @@
 # Internal - Annotate genomic variants. ----
-.annotateGenomicVariants <- function(genomicVariants){
+.annotateGenomicVariants <- function(genomicVariantsProcessed){
 
-    genomicVariantsSplitonChr <- base::split(genomicVariants, GenomeInfoDb::seqnames(genomicVariants))
+    genomicVariantsSplitonChr <- base::split(genomicVariantsProcessed, GenomeInfoDb::seqnames(genomicVariantsProcessed))
 
     genomicVariantsAnnotatedList <- base::lapply(genomicVariantsSplitonChr, .determineIMD)
 

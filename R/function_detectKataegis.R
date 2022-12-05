@@ -7,6 +7,7 @@
 #' Note that we recommend using the default parameters for the detection of kataegis.
 #'
 #' @param genomicVariants (\link[VariantAnnotation]{VRanges}, VCF or MAF): VRanges, or path to VCF or MAF file containing genomic variants.
+#' @param refSeq (character or data.frame): The used reference genome for variant calling. Choose: "hg19" or "hg38". For analysis of non standard sequences: provide a data.frame containing the length of the sequences.
 #' @param minSizeKataegis (integer): Minimal number of variants required within a segment for classification as a kataegis foci.
 #' @param IMDcutoff (numberic or function): When a numeric is supplied this represents the max mean IMD within a segment for classification as a kataegis foci. When a custom function is supplied by the user a IMD cutoff value is determined for each segment.
 #' @param test.stat (character): Distribution that is fitted to the data (Exponential or Empirical). See \link[changepoint]{cpt.meanvar}.
@@ -30,20 +31,20 @@
 #'
 #'
 #' @export
-detectKataegis <- function(genomicVariants, minSizeKataegis = 6, IMDcutoff = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam(), aggregateRecords = FALSE){
+detectKataegis <- function(genomicVariants, refSeq = "hg19", minSizeKataegis = 6, IMDcutoff = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam(), aggregateRecords = FALSE){
 
-    validateInputdetectKataegis(genomicVariants, minSizeKataegis, IMDcutoff, test.stat, penalty, pen.value, method, minseglen, BPPARAM, aggregateRecords)
+    validateInputdetectKataegis(genomicVariants, refSeq, minSizeKataegis, IMDcutoff, test.stat, penalty, pen.value, method, minseglen, BPPARAM, aggregateRecords)
 
     # Import, pre-process and annotate genomic variants. ----
-    genomicVariantsImported <- .importGenomicVariants(x = genomicVariants, aggregateRecords)
+    genomicVariantsImported <- .importGenomicVariants(genomicVariants, aggregateRecords, refSeq)
     genomicVariantsProcessed <- .processGenomicVariants(genomicVariantsImported)
     genomicVariantsAnnotated <- .annotateGenomicVariants(genomicVariantsProcessed)
 
     # Changepoint detection. ----
-    changepointsPerChromosome <- .performChangepointDetection(genomicVariantsAnnotated, test.stat, penalty, pen.value, method, minseglen, BPPARAM)
+    changepointsPerChromosome <- .performChangepointDetection(genomicVariantsAnnotated, refSeq, test.stat, penalty, pen.value, method, minseglen, BPPARAM)
 
     # Annotate segments --------------------------------------------------------
-    segments <- .annotateSegments(changepointsPerChromosome, genomicVariantsAnnotated)
+    segments <- .annotateSegments(changepointsPerChromosome, genomicVariantsAnnotated, refSeq)
 
     # Determine IMD cutoff
     IMDcutoffValues <- .determineIMDcutoffValues(IMDcutoff, genomicVariantsAnnotated, segments)
