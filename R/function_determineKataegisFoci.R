@@ -73,7 +73,7 @@
             dplyr::rowwise() |>
             # manually add the last variants to the detected kataegis foci
             dplyr::mutate(
-                firstVariantOfSeqname = base::min(genomicVariantsAnnotated$variantID[as.logical(GenomicRanges::seqnames(genomicVariantsAnnotated) == .data$seqnames)]),
+                firstVariantOfSeqname = base::min(genomicVariantsAnnotated$variantID[as.logical(as.character(GenomicRanges::seqnames(genomicVariantsAnnotated)) == as.character(.data$seqnames))]),
                 firstVariantID = base::ifelse(.data$firstVariantID != .data$firstVariantOfSeqname, .data$firstVariantID - 1, .data$firstVariantID),
                 totalVariants = .data$lastVariantID - .data$firstVariantID + 1
             ) |>

@@ -58,7 +58,11 @@
 
 .addEmptySegments <- function(segments, refSeq){
 
-    chromosomeNames <- levels(segments$seqnames)
+    if(all(refSeq %in% c("hg19", "hg38"))){
+        chromosomeNames <- paste0("chr", c(1:22, "X", "Y", "M"))
+    } else {
+        chromosomeNames <- levels(segments$seqnames)
+    }
     chromosomesWithMutations <- unique(segments$seqnames)
 
     # select chromosomes without any mutations in the sample
@@ -137,6 +141,8 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates, refSe
         .addEmptySegments(refSeq) |>
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE) |>
         GenomicRanges::sort()
+
+    GenomeInfoDb::seqlevels(segments) <- GenomeInfoDb::seqlevelsInUse(segments)
 
     return(segments)
 }

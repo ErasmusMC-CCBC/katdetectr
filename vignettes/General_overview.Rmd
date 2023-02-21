@@ -67,7 +67,7 @@ syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci
 
 # Detection of kataegis foci
 
-Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying intermutation distance (IMD) , mutation rate and size.
+Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying intermutation distance (IMD), mutation rate and size.
 
 Imported genomic variant data can contain either single or multiple samples, in the latter case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
 
