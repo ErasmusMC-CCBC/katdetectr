@@ -140,16 +140,17 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
         ggplot2::labs(x = base::sprintf('Sample: %s\nTotal variants: %s, putative kataegis foci: %s', base::unique(plotDataVariants$sampleNames), base::nrow(plotDataVariants), base::nrow(plotDataKataegis)), y = 'Intermutation Distance') +
 
         # Set alpha and scale of IMD's based on flagged within kataegis foci.
-        ggplot2::scale_alpha_manual(values = c('TRUE' = base::ifelse(showKataegis, 1, 0.5), 'FALSE' = .3), guide = 'none') +
+        ggplot2::scale_alpha_manual(values = c('TRUE' = base::ifelse(showKataegis, 1, 0.5), 'FALSE' = 0.3), guide = 'none') +
         ggplot2::scale_size_manual(values = c('TRUE' = base::ifelse(showKataegis, 2, 1), 'FALSE' = 1), guide = 'none') +
 
         # Options - Axis.
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
-        # ggplot2::scale_y_continuous(
-        #     trans = scales::pseudo_log_trans(),
-        #     breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
-        #     labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
-        #     expand = c(0, 0)) +
+
+        ggplot2::scale_y_continuous(
+            trans = scales::pseudo_log_trans(),
+            breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
+            labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
+            expand = c(0, 0)) +
 
         ggplot2::labs(y = 'IMD') +
 
@@ -177,20 +178,6 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
         ) +
 
         {if(showSegmentation)
-            ggplot2::scale_y_continuous(
-                trans = scales::pseudo_log_trans(),
-                breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
-                labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
-                expand = c(0, 0),
-                sec.axis = ggplot2::sec_axis(
-                    trans = ~ 1 / .,
-                    name = "Mutation rate",
-                    breaks = c(1, 0.1, 0.01, 0.001, 1E-4, 1E-5, 1E-6, 1E-7, 1E-8),
-                    labels = c("1", "0.1", "0.01", "1E-4", "1E-5", "1E-6", "1E-7", "1E-8", "1E-9")
-                ))
-        } +
-
-        {if(showSegmentation)
             ggplot2::geom_segment(
                 data = plotDataSegments,
                 mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$lastVariantID + 1, y = .data$meanIMD, yend = .data$meanIMD),
@@ -202,13 +189,6 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
                 data = plotDataSegments,
                 mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$firstVariantID, y = 0, yend = Inf),
                 col = 'black', lty = 'dotted')
-        } +
-
-        {if(!showSegmentation) ggplot2::scale_y_continuous(
-            trans = scales::pseudo_log_trans(),
-            breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
-            labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
-            expand = c(0, 0))
         } +
 
         {if(showKataegis & base::nrow(plotDataKataegis) != 0) ggplot2::geom_rect(

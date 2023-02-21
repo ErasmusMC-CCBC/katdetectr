@@ -25,6 +25,9 @@ BiocManager::install("katdetectr")
 
 # or the latest version
 BiocManager::install("katdetectr", version = "devel")
+
+# or from github
+devtools::install_git("https://github.com/ErasmusMC-CCBC/katdetectr")
 ```
 
 
@@ -67,7 +70,7 @@ syntheticData <- generateSyntheticData(nBackgroundVariants = 2500, nKataegisFoci
 
 # Detection of kataegis foci
 
-Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying intermutation distance (IMD) , mutation rate and size.
+Using `detectKataegis()`, we can employ changepoint detection to detect distinct clusters of varying intermutation distance (IMD), mutation rate and size.
 
 Imported genomic variant data can contain either single or multiple samples, in the latter case records can be aggregated by setting `aggregateRecords = TRUE`. Overlapping genomic variants (e.g., an InDel and SNV) are reduced into a single record.
 
@@ -139,23 +142,16 @@ rainfallPlot(kdSynthetic, showKataegis = TRUE, showSegmentation = TRUE, showSequ
 
 `katdetectr` has been implemented flexibly which allows its users to detect clustered mutations of different classes. The historical definition of kataegis foci, [postulated by Alexandrov et al.*](https://www.nature.com/articles/nature12477) is a segment harboring ≥6 variants and has a mean IMD ≤1000bp. However, these parameters can be set differently in `detectKataegis()`. 
 
-For example, other classes of mutation are:
+For example, another type of clustered mutations are called Omikli: a segment harboring 2 or 3 variants with mean IMD = m
 
-1. Doublet-base substitutions (DBS): a segments harboring 2 variants with mean IMD = 0
-2. Multi-base substitutions (MBS): a segment harboring n variants with mean IMD = 0
-3. Omikli: a segment harboring 2 or 3 variants with mean IMD = m
-
-Note that we did not evaluate the performance of `katdetectr` in regards to detecting these cluster types. The following is just to show you how to change the parameters of `detectKataegis()` if you want to use `katdetectr` for detecting these types of clusters.
+Note that we did not evaluate the performance of `katdetectr` in regards to detecting other types of clusters. The following is just to show you how to change the parameters of `detectKataegis()` if you want to use `katdetectr` for detecting these types of clusters.
 
 ```{r}
-# detect putative DBS
-kdSyntheticDBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 2, IMDcutoff = 0)
-
-# detect putative MBS, size = 3
-kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, IMDcutoff = 0)
-
 # detect putative Omikli, size 3 and mean IMD = 500
-kdSyntheticMBS <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, IMDcutoff = 500)
+kdSyntheticOmikli500 <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, IMDcutoff = 500)
+
+# detect putative Omikli, size 4 and mean IMD = 1000
+kdSyntheticOmikli500 <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 4, IMDcutoff = 1000)
 ```
 
 

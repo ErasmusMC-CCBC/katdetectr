@@ -13,7 +13,7 @@
             vcf.gz = .coerceVCFtoVRanges(x),
             maf = .coerceMAFtoVRanges(x),
             maf.gz = .coerceMAFtoVRanges(x),
-            base::stop('Provide a VRanges object or path to MAF or VCF file (extension: vcf, vcf.gz, maf, maf.gz)')
+            base::stop('Provide a VRanges object or path to MAF or VCF file (vcf, vcf.gz, maf, maf.gz)')
         )}
 
     # Check multiple samples
@@ -26,9 +26,12 @@
         }
     }
 
+    # set seqlevel style to USCS
+    GenomeInfoDb::seqlevelsStyle(genomicVariants) <- "UCSC"
+
     # check for non standard sequences
     seqLev <- GenomeInfoDb::seqlevelsInUse(genomicVariants)
-    allStandardSeqlev <- seqLev %in% paste0(rep("chr", 24), c(1:25, "X", "Y", "M"))
+    allStandardSeqlev <- seqLev %in% paste0("chr", c(1:22, "X", "Y", "M"))
     seqLevNonStandard <- seqLev[!allStandardSeqlev]
     seqLevInTib <- seqLev %in% names(refSeq)
 
@@ -36,8 +39,7 @@
         base::stop(base::paste0(c("Your genomic variant data contains the following non standard sequences:",
                                   seqLevNonStandard,
                                   "Please check the vignette on how to deal with non standard sequences."
-        ),
-        collapse = " "))
+        ), collapse = " "))
     }
 
     return(genomicVariants)
