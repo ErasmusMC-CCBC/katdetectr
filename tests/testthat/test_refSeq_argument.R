@@ -3,9 +3,11 @@
 testthat::test_that("test non standard sequences:", {
 
     set.seed(1)
+
     syndata1 <- generateSyntheticData(seqnames = c("chr1_gl000191_random", "chr4_ctg9_hap1"))
     syndata2 <- generateSyntheticData(seqnames = "chr1", nKataegisFoci = 0)
     syndata <- suppressWarnings(c(syndata1, syndata2))
+
     set.seed(NULL)
 
     sequenceLength1 = data.frame(
