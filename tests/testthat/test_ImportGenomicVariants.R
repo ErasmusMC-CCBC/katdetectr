@@ -14,8 +14,8 @@ testthat::test_that("test coerceMAFtoVRanges():", {
     vr <- .coerceMAFtoVRanges(path = system.file('extdata', 'APL_primary.maf', package = 'katdetectr'))
 
     testthat::expect_s4_class(vr, "VRanges")
-    testthat::expect_equal(base::length(vr), 224)
-    testthat::expect_equal(base::length(base::levels(base::unique(VariantAnnotation::sampleNames(vr)))), 97)
+    testthat::expect_equal(base::length(vr), 265)
+    testthat::expect_equal(base::length(base::levels(base::unique(VariantAnnotation::sampleNames(vr)))), 121)
     testthat::expect_equal(VariantAnnotation::ref(vr)[2], "G")
     testthat::expect_equal(base::as.character(GenomicRanges::seqnames(vr)[1]), "chr17")
 })

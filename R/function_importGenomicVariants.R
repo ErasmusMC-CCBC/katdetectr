@@ -78,11 +78,19 @@
         sampleNames = 'Tumor_Sample_Barcode'
     )
 
+    # a MAF object contains separate slots for the synonymous (silent) and the non-synonymous variants
+    mafSilent <-  maf@maf.silent |>
+        tibble::as.tibble()
+
     # convert maf to VRanges
     vr <- maf@data |>
         tibble::as_tibble() |>
+        # combine synonymous and non-synonymous variants
+        dplyr::bind_rows(mafSilent) |>
         # rename columns
         dplyr::rename(dplyr::any_of(columnNames)) |>
+        # remove rows of which start or end is NA
+        dplyr::filter(!is.na(.data$start) | !is.na(.data$end)) |>
         # coerce to GRanges
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE) |>
         # coerse to VRanges
