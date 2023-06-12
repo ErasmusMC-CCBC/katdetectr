@@ -137,28 +137,6 @@ rainfallPlot(kdSynthetic, showKataegis = TRUE, showSegmentation = TRUE, showSequ
 ```
 
 
-
-# More parameter settings
-
-`katdetectr` has been implemented flexibly which allows its users to detect clustered mutations of different classes. The historical definition of kataegis foci, [postulated by Alexandrov et al.*](https://www.nature.com/articles/nature12477) is a segment harboring ≥6 variants and has a mean IMD ≤1000bp. However, these parameters can be set differently in `detectKataegis()`. 
-
-For example, another type of clustered mutations are called Omikli: a segment harboring 2 or 3 variants with mean IMD = m
-
-Note that we did not evaluate the performance of `katdetectr` in regards to detecting other types of clusters. The following is just to show you how to change the parameters of `detectKataegis()` if you want to use `katdetectr` for detecting these types of clusters.
-
-```{r}
-# detect putative Omikli, size 3 and mean IMD = 500
-kdSyntheticOmikli500 <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 3, IMDcutoff = 500)
-
-# detect putative Omikli, size 4 and mean IMD = 1000
-kdSyntheticOmikli500 <- detectKataegis(genomicVariants = syntheticData, minSizeKataegis = 4, IMDcutoff = 1000)
-```
-
-
-We tested katdetectr with multiple parameter settings (test.stat, penalty, pen.value, minseglen) in order to obtain the highest performance in regards to kataegis classification. The best combination of parameters have been set as the default values. We recommend using these parameter settings! For more information regarding the these parameters for changepoint analysis see [Killick2014](https://www.jstatsoft.org/article/view/v058i03)
-
-
-
 # Custom function for IMD cutoff value. 
 
 As show previously, the IMD cutoff value can be set by the user in order to identify different types of mutation clusters. However, it is also possible to define a custom function that determines a IMD cutoff value for each detected segment. This flexibility allow you to define your own kataegis definition while still using the `katdetectr` framework. Below we show how to implement a custom function for the IMD cutoff value. The function below comes from the work of [Pan-Cancer Analysis of Whole Genomes Consortium](https://www.nature.com/articles/s41586-020-1969-6#citeas)
