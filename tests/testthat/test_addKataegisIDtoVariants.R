@@ -1,7 +1,6 @@
 testthat::test_that("test .addIDsToVariants()", {
-
     # test on larger breast cancer sample
-    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+    genomicVariantsAnnotatedCPTAC <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr") |>
         .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
@@ -25,5 +24,4 @@ testthat::test_that("test .addIDsToVariants()", {
     testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[3634], 3)
     testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[3671], 3)
     testthat::expect_equal(genomicVariantsAnnotatedCPTACkat$segmentID[3684], 7)
-
 })

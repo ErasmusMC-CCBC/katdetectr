@@ -1,6 +1,4 @@
-
 testthat::test_that("Check accessor methods:", {
-
     set.seed(1)
 
     syntheticData <- generateSyntheticData(nBackgroundVariants = 20, nKataegisFoci = 1)

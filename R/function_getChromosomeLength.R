@@ -1,11 +1,9 @@
-getChromosomeLength <- function(chromosome, refSeq){
-
+getChromosomeLength <- function(chromosome, refSeq) {
     # lookup table for calculating mutation rate of segments with < 4 variants
     # length op chromosome in bp according to BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19
 
-    if(is.character(refSeq)){
-        if(refSeq == "hg19"){
-
+    if (is.character(refSeq)) {
+        if (refSeq == "hg19") {
             chromosomeLengthTib <- tibble::tibble(
                 chr1 = 249250621,
                 chr2 = 243199373,
@@ -36,9 +34,8 @@ getChromosomeLength <- function(chromosome, refSeq){
         }
     }
 
-    if(is.character(refSeq)){
-        if(refSeq == "hg38"){
-
+    if (is.character(refSeq)) {
+        if (refSeq == "hg38") {
             chromosomeLengthTib <- tibble::tibble(
                 chr1 = 248956422,
                 chr2 = 242193529,
@@ -70,10 +67,8 @@ getChromosomeLength <- function(chromosome, refSeq){
     }
 
 
-    if(is.data.frame(refSeq)){
-
+    if (is.data.frame(refSeq)) {
         chromosomeLengthTib <- refSeq
-
     }
 
     chromosomeLength <- chromosomeLengthTib[[chromosome]]

@@ -1,9 +1,7 @@
-
 # Class - KatDetect -------------------------------------------------------
 
 #' @title KatDetect-class: KatDetect objects
 #' @description The katdetectr package introduces a new S4 object which stores all relevant information regarding kataegis detection.
-#'
 #'
 #' @slot kataegisFoci (\link[GenomicRanges]{GRanges}): Contains all
 #' annotated putative kataegis foci.
@@ -26,16 +24,18 @@
 #' @rdname KatDetect
 #' @exportClass KatDetect
 #'
+#' @return (KatDetect) KatDetect object.
+#'
 #' @author Daan Hazelaar
 #' @author Job van Riet
 #' @export
 setClass(
-    Class = 'KatDetect',
+    Class = "KatDetect",
     slots = methods::representation(
-        kataegisFoci = 'GRanges',
-        genomicVariants = 'VRanges',
-        segments = 'GRanges',
-        info = 'list'
+        kataegisFoci = "GRanges",
+        genomicVariants = "VRanges",
+        segments = "GRanges",
+        info = "list"
     ),
     prototype = base::list(
         kataegisFoci = GenomicRanges::GRanges(),
@@ -46,11 +46,10 @@ setClass(
 )
 
 
-.initkatdetect <- function(genomicVariantsAnnotatedKat, segments, kataegisFoci, info){
-
+.initkatdetect <- function(genomicVariantsAnnotatedKat, segments, kataegisFoci, info) {
     # create new KatDetect object
     kd <- methods::new(
-        'KatDetect',
+        "KatDetect",
         genomicVariants = genomicVariantsAnnotatedKat,
         segments = segments,
         kataegisFoci = kataegisFoci,

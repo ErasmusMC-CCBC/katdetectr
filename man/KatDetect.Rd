@@ -4,6 +4,9 @@
 \name{KatDetect-class}
 \alias{KatDetect-class}
 \title{KatDetect-class: KatDetect objects}
+\value{
+(KatDetect) KatDetect object.
+}
 \description{
 The katdetectr package introduces a new S4 object which stores all relevant information regarding kataegis detection.
 }
