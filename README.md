@@ -23,11 +23,15 @@ Hazelaar, D. M., van Riet, J., Hoogstrate, Y., & van de Werken, H. J. (2023). Ka
 
 ## Installation
 
-Download katdetectr from BioConductor:
+Download katdetectr from BioConductor or Github:
 ```R
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-
 BiocManager::install("katdetectr")
 
+
+# download the latest version of katdetectr from github
+if (!requireNamespace("devtools", quietly = TRUE))
+    install.packages("devtools")
+devtools::install_git(url = "https://github.com/ErasmusMC-CCBC/katdetectr")
 ```
