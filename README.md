@@ -6,28 +6,26 @@
 
 `katdetectr` is an *R* package for the detection, characterization and visualization of localized hypermutated regions, often referred to as *kataegis*.
 
-Please see the [Application Note](https://www.biorxiv.org/content/10.1101/2022.07.11.499364v3) (under submission) for additional background, details and performance evaluations of `katdetectr`.
+Please see the [Technical Note](https://academic.oup.com/gigascience/article/doi/10.1093/gigascience/giad081/7319580) for additional background, details and performance evaluations of `katdetectr`.
 
 The general workflow of `katdetectr` can be summarized as follows:
 
 1. Import of genomic variants; VCF, MAF or VRanges objects.
-2. Detection of kataegis foci.
-3. Visualization of segmentation and kataegis foci.
+2. Detection of kataegis loci.
+3. Visualization of segmentation and kataegis loci.
 
 Please see the vignette for an overview of the workflow in a step-by-step manner on publicly-available datasets which are included within this package.
 
 ## Citation
 
-Not yet published.
+Hazelaar, D. M., van Riet, J., Hoogstrate, Y., & van de Werken, H. J. (2023). Katdetectr: an R/bioconductor package utilizing unsupervised changepoint analysis for robust kataegis detection. GigaScience, 12, giad081.
 
 ## Installation
 
-### BioConductor
-
+Download katdetectr from BioConductor or Github:
 ```R
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-
 BiocManager::install("katdetectr")
 ```
 

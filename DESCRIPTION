@@ -1,8 +1,7 @@
 Package: katdetectr
-Title: Detection, Characterization and Visualization of Kataegis in
-    Sequencing Data
-Version: 1.2.1
-Date: 2023-09-17
+Title: Detection, Characterization and Visualization of Kataegis in Sequencing Data
+Version: 1.5.1
+Date: 2023-02-14
 Authors@R: c(
     person("Daan", "Hazelaar", , "daanhazelaar@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7513-6813")),

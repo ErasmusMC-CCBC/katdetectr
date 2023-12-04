@@ -110,12 +110,12 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
         dplyr::mutate(
             IMD = tidyr::replace_na(.data$IMD, -1),
             variantType = dplyr::case_when(
-                ref == "C" & alt == "T" ~ "C>T",
-                ref == "C" & alt == "G" ~ "C>G",
-                ref == "C" & alt == "A" ~ "C>A",
-                ref == "T" & alt == "C" ~ "T>C",
-                ref == "T" & alt == "A" ~ "T>A",
-                ref == "T" & alt == "G" ~ "T>G",
+                ref == "C" & alt == "T" | ref == "G" & alt == "A" ~ "C>T",
+                ref == "C" & alt == "G" | ref == "G" & alt == "C" ~ "C>G",
+                ref == "C" & alt == "A" | ref == "G" & alt == "T" ~ "C>A",
+                ref == "T" & alt == "C" | ref == "A" & alt == "G" ~ "T>C",
+                ref == "T" & alt == "A" | ref == "A" & alt == "T" ~ "T>A",
+                ref == "T" & alt == "G" | ref == "A" & alt == "C" ~ "T>G",
             ),
             variantType = base::ifelse(base::is.na(.data$variantType), "Other", .data$variantType)
         )
