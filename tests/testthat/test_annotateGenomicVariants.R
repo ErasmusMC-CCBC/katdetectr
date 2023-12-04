@@ -1,7 +1,5 @@
-
 testthat::test_that("test .annotateGenomicVariants:", {
-
-    genomicVariantsAnnotated <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+    genomicVariantsAnnotated <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr") |>
         .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
@@ -12,13 +10,12 @@ testthat::test_that("test .annotateGenomicVariants:", {
 })
 
 testthat::test_that("test .determineIMD():", {
-
     vr <- VariantAnnotation::VRanges(
         seqnames = "test",
         ranges = IRanges::IRanges(start = c(1, 6, 20, 25, 31), end = c(5, 6, 20, 27, 33)),
         ref = c("A", "A", "T", "A", "T"),
         alt = c("T", "C", "A", "C", "A")
-        )
+    )
 
     vrIMD <- .determineIMD(vr)
 

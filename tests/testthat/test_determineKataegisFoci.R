@@ -1,34 +1,32 @@
 testthat::test_that("test .determineKataegisFoci(IMDcutoff = fun())", {
-
     # test on larger breast cancer sample
-    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+    genomicVariantsAnnotatedCPTAC <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr") |>
         .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
     changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19", test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19")
 
-    modelSampleRate <- function(IMDs){
-
+    modelSampleRate <- function(IMDs) {
         lambda <- log(2) / median(IMDs)
 
         return(lambda)
     }
 
 
-    nthroot = function(x, n){
-
+    nthroot <- function(x, n) {
         y <- x^(1 / n)
 
         return(y)
     }
 
 
-    IMDcutoffFun <- function(genomicVariantsAnnotated, segments){
-
+    IMDcutoffFun <- function(genomicVariantsAnnotated, segments) {
         IMDs <- genomicVariantsAnnotated$IMD
-        totalVariants <-  segments$totalVariants
-        width <- segments |> dplyr::as_tibble() |> dplyr::pull(width)
+        totalVariants <- segments$totalVariants
+        width <- segments |>
+            dplyr::as_tibble() |>
+            dplyr::pull(width)
 
         sampleRate <- modelSampleRate(IMDs)
 
@@ -39,7 +37,7 @@ testthat::test_that("test .determineKataegisFoci(IMDcutoff = fun())", {
         return(IMDthreshold)
     }
 
-    IMDcutoffValues <- .determineIMDcutoffValues(IMDcutoffFun, genomicVariantsAnnotatedCPTAC,  segmentsCPTAC)
+    IMDcutoffValues <- .determineIMDcutoffValues(IMDcutoffFun, genomicVariantsAnnotatedCPTAC, segmentsCPTAC)
     segmentsCPTAC <- .addIMDcutoffValuesToSegments(segmentsCPTAC, IMDcutoffValues)
     kataegisFociCPTAC <- .determineKataegisFoci(segmentsCPTAC, genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, IMDcutoff = IMDcutoffValues)
 
@@ -54,15 +52,14 @@ testthat::test_that("test .determineKataegisFoci(IMDcutoff = fun())", {
 })
 
 testthat::test_that("test .determineKataegisFoci(IMDcutoff = 1000)", {
-
     # test on larger breast cancer sample
-    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+    genomicVariantsAnnotatedCPTAC <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr") |>
         .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
     changepointsCPTAC <- .performChangepointDetection(genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19", test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam())
     segmentsCPTAC <- .annotateSegments(changepoints = changepointsCPTAC, genomicVariantsAnnotated = genomicVariantsAnnotatedCPTAC, refSeq = "hg19")
-    IMDcutoffValues <- .determineIMDcutoffValues(1000, genomicVariantsAnnotatedCPTAC,  segmentsCPTAC)
+    IMDcutoffValues <- .determineIMDcutoffValues(1000, genomicVariantsAnnotatedCPTAC, segmentsCPTAC)
     segmentsCPTAC <- .addIMDcutoffValuesToSegments(segmentsCPTAC, IMDcutoffValues)
     kataegisFociCPTAC <- .determineKataegisFoci(segmentsCPTAC, genomicVariantsAnnotatedCPTAC, minSizeKataegis = 5, IMDcutoff = IMDcutoffValues)
 
@@ -77,17 +74,18 @@ testthat::test_that("test .determineKataegisFoci(IMDcutoff = 1000)", {
 })
 
 testthat::test_that("test .annotateKataegisSegments()", {
-
     testVariants <- GenomicRanges::GRanges(
         seqnames = c(base::rep("chr1", 539), base::rep("chrX", 113)),
         ranges = IRanges::IRanges(start = 1:652, end = 1:652),
         variantID = 1:652
-        )
+    )
 
     testSegments <- GenomicRanges::GRanges(
         seqnames = c("chr1", "chr1", "chr1", "chr1", "chr1", "chrX"),
-        ranges = IRanges::IRanges(start = c(11, 20, 30, 40, 50, 1000),
-                                  end =  c(11, 20, 30, 40, 50, 1000)),
+        ranges = IRanges::IRanges(
+            start = c(11, 20, 30, 40, 50, 1000),
+            end = c(11, 20, 30, 40, 50, 1000)
+        ),
         segmentID = c(1, 2, 3, 4, 5, 6),
         meanIMD = c(1001, 1000, 10, 5000, 60000, 5),
         totalVariants = c(11, 15, 500, 2, 11, 113),
@@ -111,17 +109,18 @@ testthat::test_that("test .annotateKataegisSegments()", {
 })
 
 testthat::test_that("test .mergeKataegisSegments()", {
-
     testSegments <- GenomicRanges::GRanges(
         seqnames = c("chr1", "chr1", "chr1", "chr1", "chr1", "chrX"),
-        ranges = IRanges::IRanges(start = c(1, 2, 3, 4, 5, 1),
-                                  end =  c(1, 2, 3, 4, 5, 1)),
+        ranges = IRanges::IRanges(
+            start = c(1, 2, 3, 4, 5, 1),
+            end = c(1, 2, 3, 4, 5, 1)
+        ),
         segmentID = c(1, 2, 3, 4, 5, 6),
         meanIMD = c(1001, 1000, 10, 5000, 60000, 5),
         totalVariants = c(11, 15, 500, 2, 11, 113),
         sampleNames = c("testSample", "testSample", "testSample", "testSample", "testSample", "testSample"),
         firstVariantID = c(1, 12, 27, 527, 529, 538),
-        lastVariantID = c(11, 26, 526, 528,539, 650)
+        lastVariantID = c(11, 26, 526, 528, 539, 650)
     )
 
     katSegs <- .determineKataegisSegments(segments = testSegments, IMDcutoff = 1000)
@@ -136,11 +135,12 @@ testthat::test_that("test .mergeKataegisSegments()", {
 })
 
 testthat::test_that("test .determineKataegisSegments()", {
-
     testSegments <- GenomicRanges::GRanges(
         seqnames = c("chr1", "chr1", "chr1", "chr1", "chr1", "chrX"),
-        ranges = IRanges::IRanges(start = c(1, 2, 3, 4, 5, 1),
-                                  end =  c(1, 2, 3, 4, 5, 1)),
+        ranges = IRanges::IRanges(
+            start = c(1, 2, 3, 4, 5, 1),
+            end = c(1, 2, 3, 4, 5, 1)
+        ),
         segmentID = c(1, 2, 3, 4, 5, 6),
         meanIMD = c(1001, 1000, 10, 5000, 60000, 5),
         totalVariants = c(3, 9, 15, 500, 2, 9),
@@ -155,11 +155,9 @@ testthat::test_that("test .determineKataegisSegments()", {
 })
 
 testthat::test_that("test .determinefociID()", {
-
     testFociID1 <- .determinefociID(c(1, 2, 4, 5, 6, 10))
     testFociID2 <- .determinefociID(c(1, 10))
 
     testthat::expect_equal(testFociID1, c(1, 1, 2, 2, 2, 3))
     testthat::expect_equal(testFociID2, c(1, 2))
 })
-

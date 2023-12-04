@@ -31,8 +31,7 @@
 #'
 #'
 #' @export
-detectKataegis <- function(genomicVariants, refSeq = "hg19", minSizeKataegis = 6, IMDcutoff = 1000, test.stat = 'Exponential', penalty = 'BIC', pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam(), aggregateRecords = FALSE){
-
+detectKataegis <- function(genomicVariants, refSeq = "hg19", minSizeKataegis = 6, IMDcutoff = 1000, test.stat = "Exponential", penalty = "BIC", pen.value = 0, method = "PELT", minseglen = 2, BPPARAM = BiocParallel::SerialParam(), aggregateRecords = FALSE) {
     validateInputdetectKataegis(genomicVariants, refSeq, minSizeKataegis, IMDcutoff, test.stat, penalty, pen.value, method, minseglen, BPPARAM, aggregateRecords)
 
     # Import, pre-process and annotate genomic variants. ----
@@ -66,4 +65,3 @@ detectKataegis <- function(genomicVariants, refSeq = "hg19", minSizeKataegis = 6
 
     return(kd)
 }
-

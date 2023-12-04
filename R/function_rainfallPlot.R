@@ -34,8 +34,7 @@
 #' @author Daan Hazelaar
 #' @author Job van Riet
 #' @export
-rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegmentation = FALSE){
-
+rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegmentation = FALSE) {
     # Input validation ---------------------------------------------------------
     .validateInputRainfallPlot(kd, showSequence, showKataegis, showSegmentation)
 
@@ -64,44 +63,48 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
     return(p)
 }
 
-.validateInputRainfallPlot <- function(kd, showSequence, showKataegis, showSegmentation){
-
-    checkmate::assertClass(kd, classes = 'KatDetect')
+.validateInputRainfallPlot <- function(kd, showSequence, showKataegis, showSegmentation) {
+    checkmate::assertClass(kd, classes = "KatDetect")
     checkmate::assertCharacter(showSequence)
     checkmate::assertLogical(showKataegis)
     checkmate::assertLogical(showSegmentation)
 
     # Check if requested sequence is in the given data.
-    sequencesInData <- kd |> katdetectr::getGenomicVariants() |> GenomeInfoDb::seqlevelsInUse()
-    if(base::any(showSequence != 'All') & base::any(showSequence != 'Kataegis')){
-        if(!base::all(showSequence %in% sequencesInData)){
-            base::stop('Requested sequences are not present in the data.')
+    sequencesInData <- kd |>
+        katdetectr::getGenomicVariants() |>
+        GenomeInfoDb::seqlevelsInUse()
+    if (base::any(showSequence != "All") & base::any(showSequence != "Kataegis")) {
+        if (!base::all(showSequence %in% sequencesInData)) {
+            base::stop("Requested sequences are not present in the data.")
         }
     }
 }
 
-.selectSequences <- function(kd, showSequence){
+.selectSequences <- function(kd, showSequence) {
     # Check if any chromosome harbors putative kataegis, else show all chromosome by default.
-    if(base::length(showSequence) == 1){
-        if(showSequence == 'All'){
+    if (base::length(showSequence) == 1) {
+        if (showSequence == "All") {
             selectedSequences <- GenomeInfoDb::seqlevelsInUse(getGenomicVariants(kd))
-        } else if(base::length(getKataegisFoci(kd)) == 0 & showSequence == 'Kataegis'){
+        } else if (base::length(getKataegisFoci(kd)) == 0 & showSequence == "Kataegis") {
             selectedSequences <- GenomeInfoDb::seqlevelsInUse(getGenomicVariants(kd))
-        } else if(showSequence == 'Kataegis'){
+        } else if (showSequence == "Kataegis") {
             selectedSequences <- kd |>
                 katdetectr::getKataegisFoci() |>
                 tibble::as_tibble() |>
                 dplyr::distinct(.data$seqnames) |>
                 dplyr::pull() |>
                 base::as.character()
-        } else {selectedSequences <- showSequence}
-    } else {selectedSequences <- showSequence}
+        } else {
+            selectedSequences <- showSequence
+        }
+    } else {
+        selectedSequences <- showSequence
+    }
 
     return(selectedSequences)
 }
 
-.convertVariantsToGGplotFormat <- function(genomicVariants){
-
+.convertVariantsToGGplotFormat <- function(genomicVariants) {
     plotDataVariants <- genomicVariants |>
         tibble::as_tibble() |>
         dplyr::mutate(
@@ -120,82 +123,89 @@ rainfallPlot <- function(kd, showSequence = 'All', showKataegis = TRUE, showSegm
     return(plotDataVariants)
 }
 
-.generateRainfallPlot <- function(plotDataVariants, plotDataKataegis, plotDataSegments, showKataegis, showSegmentation){
-
+.generateRainfallPlot <- function(plotDataVariants, plotDataKataegis, plotDataSegments, showKataegis, showSegmentation) {
     p <- plotDataVariants |>
         ggplot2::ggplot(ggplot2::aes(x = .data$variantID, y = .data$IMD, group = .data$seqnames)) +
 
         # Plot 5' IMDs.
         ggplot2::geom_point(
             mapping = ggplot2::aes(fill = .data$variantType, group = .data$seqnames, alpha = .data$putativeKataegis, size = .data$putativeKataegis),
-            color ='black', shape = 21) +
+            color = "black", shape = 21
+        ) +
 
         # Color point on mutational type.
         ggplot2::scale_fill_manual(
-            name = 'Mutational Type',
-            values = c('C>T' = '#E82A25','C>G' ='#010101' , 'C>A' = '#25BDEE', 'T>C' = '#e6e600', 'T>A' = '#CAC9C9', 'T>G' = '#ECC9C8', 'Other' = 'grey50'),
-            guide = ggplot2::guide_legend(title.position = 'top', title.hjust = 0.5, nrow = 1, keywidth = 0.5, keyheight = 0.5)) +
+            name = "Mutational Type",
+            values = c("C>T" = "#E82A25", "C>G" = "#010101", "C>A" = "#25BDEE", "T>C" = "#e6e600", "T>A" = "#CAC9C9", "T>G" = "#ECC9C8", "Other" = "grey50"),
+            guide = ggplot2::guide_legend(title.position = "top", title.hjust = 0.5, nrow = 1, keywidth = 0.5, keyheight = 0.5)
+        ) +
 
         # Labs.
-        ggplot2::labs(x = base::sprintf('Sample: %s\nTotal variants: %s, putative kataegis foci: %s', base::unique(plotDataVariants$sampleNames), base::nrow(plotDataVariants), base::nrow(plotDataKataegis)), y = 'Intermutation Distance') +
+        ggplot2::labs(x = base::sprintf("Sample: %s\nTotal variants: %s, putative kataegis foci: %s", base::unique(plotDataVariants$sampleNames), base::nrow(plotDataVariants), base::nrow(plotDataKataegis)), y = "Intermutation Distance") +
 
         # Set alpha and scale of IMD's based on flagged within kataegis foci.
-        ggplot2::scale_alpha_manual(values = c('TRUE' = base::ifelse(showKataegis, 1, 0.5), 'FALSE' = 0.3), guide = 'none') +
-        ggplot2::scale_size_manual(values = c('TRUE' = base::ifelse(showKataegis, 2, 1), 'FALSE' = 1), guide = 'none') +
+        ggplot2::scale_alpha_manual(values = c("TRUE" = base::ifelse(showKataegis, 1, 0.5), "FALSE" = 0.3), guide = "none") +
+        ggplot2::scale_size_manual(values = c("TRUE" = base::ifelse(showKataegis, 2, 1), "FALSE" = 1), guide = "none") +
 
         # Options - Axis.
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
-
         ggplot2::scale_y_continuous(
             trans = scales::pseudo_log_trans(),
             breaks = c(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000),
-            labels = c('1bp', '10bp', '100bp', '1000bp', '0.01Mbp', '0.1Mbp', '1Mbp', '10Mbp', '100Mbp'),
-            expand = c(0, 0)) +
-
-        ggplot2::labs(y = 'IMD') +
+            labels = c("1bp", "10bp", "100bp", "1000bp", "0.01Mbp", "0.1Mbp", "1Mbp", "10Mbp", "100Mbp"),
+            expand = c(0, 0)
+        ) +
+        ggplot2::labs(y = "IMD") +
 
         # Split on chromosomes.
-        ggplot2::facet_grid(.~.data$seqnames, space = 'free_x', scales = 'free_x', drop = TRUE) +
+        ggplot2::facet_grid(. ~ .data$seqnames, space = "free_x", scales = "free_x", drop = TRUE) +
 
         # Theme.
         ggplot2::theme(
-            panel.spacing.x = ggplot2::unit(0.05, 'lines'),
-            legend.position = 'bottom',
-            legend.direction = 'horizontal',
-            text = ggplot2::element_text(size = 9, family = 'Helvetica', face = 'bold'),
+            panel.spacing.x = ggplot2::unit(0.05, "lines"),
+            legend.position = "bottom",
+            legend.direction = "horizontal",
+            text = ggplot2::element_text(size = 9, family = "Helvetica", face = "bold"),
             axis.text.x = ggplot2::element_blank(),
             axis.ticks.x = ggplot2::element_blank(),
-            axis.title.y = ggtext::element_textbox_simple(size = 8, orientation = 'left-rotated', width = NULL, halign = .5),
+            axis.title.y = ggtext::element_textbox_simple(size = 8, orientation = "left-rotated", width = NULL, halign = .5),
             panel.grid.major.x = ggplot2::element_blank(),
             panel.grid.minor.x = ggplot2::element_blank(),
-            panel.grid.major.y = ggplot2::element_line(colour = '#E5E5E5', linetype = 'dotted'),
+            panel.grid.major.y = ggplot2::element_line(colour = "#E5E5E5", linetype = "dotted"),
             panel.grid.minor.y = ggplot2::element_blank(),
-            panel.background = ggplot2::element_rect(fill = NA, colour = 'black'),
+            panel.background = ggplot2::element_rect(fill = NA, colour = "black"),
             panel.border = ggplot2::element_rect(fill = NA, colour = NA),
             strip.background = ggplot2::element_blank(),
             legend.key = ggplot2::element_blank(),
             strip.text = ggplot2::element_text(angle = 60)
         ) +
-
-        {if(showSegmentation)
-            ggplot2::geom_segment(
-                data = plotDataSegments,
-                mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$lastVariantID + 1, y = .data$meanIMD, yend = .data$meanIMD),
-                col = 'black', lty = 'solid', na.rm = TRUE)
+        {
+            if (showSegmentation) {
+                ggplot2::geom_segment(
+                    data = plotDataSegments,
+                    mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$lastVariantID + 1, y = .data$meanIMD, yend = .data$meanIMD),
+                    col = "black", lty = "solid", na.rm = TRUE
+                )
+            }
         } +
-
-        {if(showSegmentation)
-            ggplot2::geom_segment(
-                data = plotDataSegments,
-                mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$firstVariantID, y = 0, yend = Inf),
-                col = 'black', lty = 'dotted')
+        {
+            if (showSegmentation) {
+                ggplot2::geom_segment(
+                    data = plotDataSegments,
+                    mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$firstVariantID, y = 0, yend = Inf),
+                    col = "black", lty = "dotted"
+                )
+            }
         } +
-
-        {if(showKataegis & base::nrow(plotDataKataegis) != 0) ggplot2::geom_rect(
-            data = plotDataKataegis,
-            inherit.aes = FALSE,
-            ggplot2::aes(xmin = .data$firstVariantID, xmax = .data$lastVariantID, ymin = 0, ymax = Inf, group = .data$seqnames),
-            fill = '#0080FF30')
+        {
+            if (showKataegis & base::nrow(plotDataKataegis) != 0) {
+                ggplot2::geom_rect(
+                    data = plotDataKataegis,
+                    inherit.aes = FALSE,
+                    ggplot2::aes(xmin = .data$firstVariantID, xmax = .data$lastVariantID, ymin = 0, ymax = Inf, group = .data$seqnames),
+                    fill = "#0080FF30"
+                )
+            }
         }
 
     return(p)
