@@ -1,27 +1,26 @@
 # Internal - Import supplied genomic variants. ----
 
-.importGenomicVariants <- function(x, aggregateRecords, refSeq){
-
+.importGenomicVariants <- function(x, aggregateRecords, refSeq) {
     # Check type of provided data and import accordingly. ----
-    if(methods::is(x, 'VRanges')){
+    if (methods::is(x, "VRanges")) {
         genomicVariants <- x
-    }else{
+    } else {
         # Coerce based on file extension.
-        genomicVariants <- base::switch(
-            ifelse(tools::file_ext(x) == 'gz', tools::file_ext(base::gsub('.gz', '', x)), tools::file_ext(x)),
+        genomicVariants <- base::switch(ifelse(tools::file_ext(x) == "gz", tools::file_ext(base::gsub(".gz", "", x)), tools::file_ext(x)),
             vcf = .coerceVCFtoVRanges(x),
             vcf.gz = .coerceVCFtoVRanges(x),
             maf = .coerceMAFtoVRanges(x),
             maf.gz = .coerceMAFtoVRanges(x),
-            base::stop('Provide a VRanges object or path to MAF or VCF file (vcf, vcf.gz, maf, maf.gz)')
-        )}
+            base::stop("Provide a VRanges object or path to MAF or VCF file (vcf, vcf.gz, maf, maf.gz)")
+        )
+    }
 
     # Check multiple samples
-    if(base::length(base::unique(Biobase::sampleNames(genomicVariants))) != 1){
-        if(!aggregateRecords){
-            base::stop('Your genomic variant data contains multiple sample names. Provide data from a single sample or set aggregateRecords = TRUE')
-        }else{
-            Biobase::sampleNames(genomicVariants) <- base::paste(base::unique(Biobase::sampleNames(genomicVariants)), collapse = ', ')
+    if (base::length(base::unique(Biobase::sampleNames(genomicVariants))) != 1) {
+        if (!aggregateRecords) {
+            base::stop("Your genomic variant data contains multiple sample names. Provide data from a single sample or set aggregateRecords = TRUE")
+        } else {
+            Biobase::sampleNames(genomicVariants) <- base::paste(base::unique(Biobase::sampleNames(genomicVariants)), collapse = ", ")
             genomicVariants <- IRanges::unique(genomicVariants)
         }
     }
@@ -35,10 +34,11 @@
     seqLevNonStandard <- seqLev[!allStandardSeqlev]
     seqLevInTib <- seqLev %in% names(refSeq)
 
-    if(!all(allStandardSeqlev) & !all(seqLevInTib)){
-        base::stop(base::paste0(c("Your genomic variant data contains the following non standard sequences:",
-                                  seqLevNonStandard,
-                                  "Please check the vignette on how to deal with non standard sequences."
+    if (!all(allStandardSeqlev) & !all(seqLevInTib)) {
+        base::stop(base::paste0(c(
+            "Your genomic variant data contains the following non standard sequences:",
+            seqLevNonStandard,
+            "Please check the vignette on how to deal with non standard sequences."
         ), collapse = " "))
     }
 
@@ -47,8 +47,7 @@
 
 
 # Helper - Coerce VCF into VRanges. ----
-.coerceVCFtoVRanges <- function(path = NULL){
-
+.coerceVCFtoVRanges <- function(path = NULL) {
     # Read vcf as VRanges.
     vr <- VariantAnnotation::readVcfAsVRanges(path)
 
@@ -56,31 +55,30 @@
     GenomicRanges::mcols(vr) <- NULL
 
     # Change seqlevel style.
-    GenomeInfoDb::seqlevelsStyle(vr) <- 'UCSC'
+    GenomeInfoDb::seqlevelsStyle(vr) <- "UCSC"
 
     return(vr)
 }
 
 # Helper - Coerce MAF into VRanges. ----
-.coerceMAFtoVRanges <- function(path = NULL){
-
+.coerceMAFtoVRanges <- function(path = NULL) {
     # use read.maf function from maftools for import
     maf <- maftools::read.maf(maf = path, verbose = FALSE)
 
     # specify the correct column names in order to coerce maf to granges
     columnNames <- c(
-        seqnames = 'Chromosome',
-        start = 'Start_Position',
-        end = 'End_Position',
-        strand = 'Strand',
-        ref = 'Reference_Allele',
-        alt = 'Tumor_Seq_Allele2',
-        sampleNames = 'Tumor_Sample_Barcode'
+        seqnames = "Chromosome",
+        start = "Start_Position",
+        end = "End_Position",
+        strand = "Strand",
+        ref = "Reference_Allele",
+        alt = "Tumor_Seq_Allele2",
+        sampleNames = "Tumor_Sample_Barcode"
     )
 
     # a MAF object contains separate slots for the synonymous (silent) and the non-synonymous variants
-    mafSilent <-  maf@maf.silent |>
-        tibble::as.tibble()
+    mafSilent <- maf@maf.silent |>
+        tibble::as_tibble()
 
     # convert maf to VRanges
     vr <- maf@data |>
@@ -97,7 +95,7 @@
         VariantAnnotation::makeVRangesFromGRanges()
 
     # change seqlevel style
-    GenomeInfoDb::seqlevelsStyle(vr) <- 'UCSC'
+    GenomeInfoDb::seqlevelsStyle(vr) <- "UCSC"
 
     return(vr)
 }

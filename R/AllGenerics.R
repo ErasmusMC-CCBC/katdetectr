@@ -11,7 +11,7 @@
 #' @rdname getKataegisFoci
 #' @export
 #'
-setGeneric('getKataegisFoci', function(x) standardGeneric("getKataegisFoci"))
+setGeneric("getKataegisFoci", function(x) standardGeneric("getKataegisFoci"))
 
 #' @title Retrieve genomic variants from KatDetect object.
 #' @param x (KatDetect): KatDetect object.
@@ -24,7 +24,7 @@ setGeneric('getKataegisFoci', function(x) standardGeneric("getKataegisFoci"))
 #' @rdname getGenomicVariants
 #' @export
 #'
-setGeneric('getGenomicVariants', function(x) standardGeneric("getGenomicVariants"))
+setGeneric("getGenomicVariants", function(x) standardGeneric("getGenomicVariants"))
 
 #' @title Retrieve segments from KatDetect a object.
 #' @inheritParams getGenomicVariants
@@ -37,7 +37,7 @@ setGeneric('getGenomicVariants', function(x) standardGeneric("getGenomicVariants
 #' @rdname getSegments
 #' @export
 #'
-setGeneric('getSegments', function(x) standardGeneric("getSegments"))
+setGeneric("getSegments", function(x) standardGeneric("getSegments"))
 
 #' @title Retrieve model parameters from a KatDetect object.
 #' @inheritParams getGenomicVariants
@@ -50,4 +50,4 @@ setGeneric('getSegments', function(x) standardGeneric("getSegments"))
 #' @rdname getInfo
 #' @export
 #'
-setGeneric('getInfo', function(x) standardGeneric("getInfo"))
+setGeneric("getInfo", function(x) standardGeneric("getInfo"))

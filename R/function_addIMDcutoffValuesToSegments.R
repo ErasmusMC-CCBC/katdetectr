@@ -1,5 +1,4 @@
-.addIMDcutoffValuesToSegments <- function(segments, IMDcutoffValues){
-
+.addIMDcutoffValuesToSegments <- function(segments, IMDcutoffValues) {
     segments$IMDcutoffValues <- IMDcutoffValues
 
     return(segments)

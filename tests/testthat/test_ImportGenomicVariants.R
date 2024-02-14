@@ -1,8 +1,7 @@
 testthat::test_that("test .importGenomicVariants():", {
+    testthat::expect_error(.importGenomicVariants(system.file("extdata", "APL_primary.maf", package = "katdetectr")))
 
-    testthat::expect_error(.importGenomicVariants(system.file('extdata', 'APL_primary.maf', package = 'katdetectr')))
-
-    vrCPTAC <- .importGenomicVariants(system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr'), refSeq = "hg19")
+    vrCPTAC <- .importGenomicVariants(system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr"), refSeq = "hg19")
 
     testthat::expect_s4_class(vrCPTAC, "VRanges")
     testthat::expect_equal(base::length(vrCPTAC), 3687)
@@ -10,8 +9,7 @@ testthat::test_that("test .importGenomicVariants():", {
 })
 
 testthat::test_that("test coerceMAFtoVRanges():", {
-
-    vr <- .coerceMAFtoVRanges(path = system.file('extdata', 'APL_primary.maf', package = 'katdetectr'))
+    vr <- .coerceMAFtoVRanges(path = system.file("extdata", "APL_primary.maf", package = "katdetectr"))
 
     testthat::expect_s4_class(vr, "VRanges")
     testthat::expect_equal(base::length(vr), 265)
@@ -22,8 +20,7 @@ testthat::test_that("test coerceMAFtoVRanges():", {
 
 
 testthat::test_that("test coerceVCFtoVRanges():", {
-
-    pathToVCF <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr')
+    pathToVCF <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr")
     vr <- .coerceVCFtoVRanges(path = pathToVCF)
 
     testthat::expect_s4_class(vr, "VRanges")

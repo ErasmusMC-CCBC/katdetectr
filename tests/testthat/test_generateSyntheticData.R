@@ -1,5 +1,4 @@
 testthat::test_that("test .generateBackgroundVariants():", {
-
     base::set.seed(1)
 
     syntheticDataTest <- generateSyntheticData(
@@ -44,12 +43,11 @@ testthat::test_that("test .generateBackgroundVariants():", {
 })
 
 testthat::test_that("test .generateBackgroundVariants():", {
-
     base::set.seed(1)
 
     hg38 <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
     testDataInit <- tibble::tibble(
-        seqnames= c("chr1", "chr2"),
+        seqnames = c("chr1", "chr2"),
         length = c(248956422, 242193529),
         probMut = c(.8, .2)
     )
@@ -69,13 +67,10 @@ testthat::test_that("test .generateBackgroundVariants():", {
     testthat::expect_equal(testVariants$mutType[90], "Deletion")
     testthat::expect_equal(testVariants$REF[90], "GG")
     testthat::expect_equal(testVariants$ALT[90], "G")
-
-
 })
 
 
 testthat::test_that("test .generateKataegisVariants():", {
-
     base::set.seed(1)
 
     hg38 <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
@@ -97,12 +92,11 @@ testthat::test_that("test .generateKataegisVariants():", {
 })
 
 testthat::test_that("test .generateKataegisFoci():", {
-
     base::set.seed(1)
 
     hg38 <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
     initDataTest1 <- .determineInitialProbabilities(selectedSequences = c("chr1", "chrX"), genome = hg38)
-    testFoci <- .generateKataegisFoci(synthFociID = 1 ,dataInit = initDataTest1, nKataegisFoci = 5, nKataegisVariants = 10, expectedIMD = 500)
+    testFoci <- .generateKataegisFoci(synthFociID = 1, dataInit = initDataTest1, nKataegisFoci = 5, nKataegisVariants = 10, expectedIMD = 500)
 
     base::set.seed(NULL)
 
@@ -114,7 +108,6 @@ testthat::test_that("test .generateKataegisFoci():", {
 })
 
 testthat::test_that("test .selectSequencesgenerateSyntheticData():", {
-
     hg38 <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 
     selectedSequences1 <- .selectSequencesgenerateSyntheticData(seqnames = c("chr1", "chrX"), genome = hg38)
@@ -131,7 +124,6 @@ testthat::test_that("test .selectSequencesgenerateSyntheticData():", {
 })
 
 testthat::test_that("test .determineInitProbabilities():", {
-
     hg38 <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 
     initDataTest1 <- .determineInitialProbabilities(selectedSequences = c("chr1", "chrX"), genome = hg38)
@@ -142,4 +134,3 @@ testthat::test_that("test .determineInitProbabilities():", {
     testthat::expect_equal(initDataTest2$seqnames, c("chr1", "chrX", "chr2", "chr18"))
     testthat::expect_equal(base::sum(initDataTest2$probMut), 1)
 })
-

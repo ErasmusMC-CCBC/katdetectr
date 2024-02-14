@@ -53,7 +53,7 @@ syntheticData2 <- generateSyntheticData(
     nKataegisVariants = 25,
     sampleName = "testSample",
     removeValidationColumns = FALSE
-    )
+)
 
 }
 \author{

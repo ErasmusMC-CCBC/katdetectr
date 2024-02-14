@@ -66,4 +66,3 @@ detectKataegis <- function(genomicVariants, refSeq = "hg38", minSizeKataegis = 6
 
     return(kd)
 }
-

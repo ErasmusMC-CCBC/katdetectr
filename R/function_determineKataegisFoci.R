@@ -1,5 +1,4 @@
-.determineKataegisFoci <- function(segments, genomicVariantsAnnotated, minSizeKataegis, IMDcutoffValues){
-
+.determineKataegisFoci <- function(segments, genomicVariantsAnnotated, minSizeKataegis, IMDcutoffValues) {
     kataegisFoci <- segments |>
         .determineKataegisSegments(IMDcutoffValues = IMDcutoffValues) |>
         .mergeKataegisSegments(minSizeKataegis = minSizeKataegis) |>
@@ -8,11 +7,10 @@
     return(kataegisFoci)
 }
 
-.determineKataegisSegments <- function(segments, IMDcutoffValues){
-
+.determineKataegisSegments <- function(segments, IMDcutoffValues) {
     selectedSegments <- segments |>
         tibble::as_tibble() |>
-        dplyr::mutate(IMDcutoff = {{IMDcutoffValues}}) |>
+        dplyr::mutate(IMDcutoff = {{ IMDcutoffValues }}) |>
         dplyr::filter(.data$meanIMD <= .data$IMDcutoff) |>
         dplyr::group_by(.data$seqnames)
 
@@ -20,8 +18,7 @@
 }
 
 # function for annotating kataegis foci also merges segments that are in a single kataegis foci.
-.determinefociID <- function(segmentIDs){
-
+.determinefociID <- function(segmentIDs) {
     nFoci <- base::sum(c(1, base::diff(segmentIDs)) != 1) + 1
     nSegmentsInFoci <- base::diff(c(1, base::which(c(1, base::diff(segmentIDs)) != 1), base::length(segmentIDs) + 1))
     fociID <- base::rep(base::seq_len(nFoci), nSegmentsInFoci)
@@ -29,10 +26,9 @@
     return(fociID)
 }
 
-.mergeKataegisSegments <- function(kataegisSegments, minSizeKataegis){
-
+.mergeKataegisSegments <- function(kataegisSegments, minSizeKataegis) {
     # when no kataegis foci are present in the segments
-    if(base::nrow(kataegisSegments) == 0){
+    if (base::nrow(kataegisSegments) == 0) {
         kataegisFoci <- tibble::tibble()
     } else {
         kataegisFoci <- kataegisSegments |>
@@ -59,12 +55,11 @@
     return(kataegisFoci)
 }
 
-.annotateKataegisSegments <- function(kataegisFoci, genomicVariantsAnnotated){
-
+.annotateKataegisSegments <- function(kataegisFoci, genomicVariantsAnnotated) {
     # when still no kataegis foci are detected after merging of segments
-    if(base::nrow(kataegisFoci) == 0){
+    if (base::nrow(kataegisFoci) == 0) {
         kataegisFociAnnotated <- GenomicRanges::GRanges()
-    }else{
+    } else {
         kataegisFociAnnotated <- kataegisFoci |>
             # remove old fociID
             dplyr::select(!.data$fociID) |>

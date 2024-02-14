@@ -1,7 +1,6 @@
 testthat::test_that("test .annotateSegments():", {
-
     # test on maf file
-    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+    genomicVariantsAnnotatedCPTAC <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr") |>
         .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
@@ -36,9 +35,8 @@ testthat::test_that("test .annotateSegments():", {
 })
 
 testthat::test_that("test .addEmptySegments:", {
-
     # test on maf file
-    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+    genomicVariantsAnnotatedCPTAC <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr") |>
         .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()
@@ -65,8 +63,7 @@ testthat::test_that("test .addEmptySegments:", {
 
 
 testthat::test_that("test .determineSegmentID:", {
-
-    changepoints <- list(testSample1 = c(0 , 5, 43, 46, 52, 56), testSample2 = c(0, 5))
+    changepoints <- list(testSample1 = c(0, 5, 43, 46, 52, 56), testSample2 = c(0, 5))
 
     segmentIDs <- .determineSegmentID(changepoints)
 
@@ -77,8 +74,7 @@ testthat::test_that("test .determineSegmentID:", {
 })
 
 testthat::test_that("test .determineSegmentIDperChr:", {
-
-    changepoints <- c(0 , 5, 43, 46, 52, 56, 100, 10200)
+    changepoints <- c(0, 5, 43, 46, 52, 56, 100, 10200)
 
     segmentIDs <- .determineSegmentIDperChr(changepoints)
 
@@ -87,4 +83,3 @@ testthat::test_that("test .determineSegmentIDperChr:", {
     testthat::expect_equal(segmentIDs[56], 5)
     testthat::expect_equal(segmentIDs[61], 6)
 })
-

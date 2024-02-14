@@ -1,7 +1,6 @@
 testthat::test_that("test .performChangepointDetection:", {
-
     # test on larger breast cancer sample
-    genomicVariantsAnnotatedCPTAC <- system.file('extdata', 'CPTAC_Breast.vcf', package = 'katdetectr') |>
+    genomicVariantsAnnotatedCPTAC <- system.file("extdata", "CPTAC_Breast.vcf", package = "katdetectr") |>
         .importGenomicVariants(refSeq = "hg19") |>
         .processGenomicVariants() |>
         .annotateGenomicVariants()

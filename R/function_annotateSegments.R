@@ -1,6 +1,4 @@
-
-.annotateSegments <- function(changepointsPerChromosome, genomicVariantsAnnotated, refSeq){
-
+.annotateSegments <- function(changepointsPerChromosome, genomicVariantsAnnotated, refSeq) {
     # obtain results from changepoint analysis
     changepoints <- .getChangepoints(changepointsPerChromosome)
     rates <- .getRates(changepointsPerChromosome)
@@ -15,31 +13,31 @@
 }
 
 
-.getChangepoints <- function(changepointsPerChromosome){
-
-    changepoints <- lapply(changepointsPerChromosome, function(chromosome){chromosome$changepointsChromosome})
+.getChangepoints <- function(changepointsPerChromosome) {
+    changepoints <- lapply(changepointsPerChromosome, function(chromosome) {
+        chromosome$changepointsChromosome
+    })
 
     return(changepoints)
 }
 
-.getRates <- function(changepointsPerChromosome){
-
-    rates <- lapply(changepointsPerChromosome, function(chromosome){chromosome$rateChromosome}) |>
+.getRates <- function(changepointsPerChromosome) {
+    rates <- lapply(changepointsPerChromosome, function(chromosome) {
+        chromosome$rateChromosome
+    }) |>
         unlist(use.names = FALSE)
 
     return(rates)
 }
 
-.determineSegmentID <- function(changepoints){
-
+.determineSegmentID <- function(changepoints) {
     segmentIDs <- base::lapply(changepoints, .determineSegmentIDperChr) |>
         base::unlist(use.names = FALSE)
 
     return(segmentIDs)
 }
 
-.determineSegmentIDperChr <- function(changepointsPerChr){
-
+.determineSegmentIDperChr <- function(changepointsPerChr) {
     nSegments <- base::length(changepointsPerChr) - 1
     difference <- base::diff(changepointsPerChr)
     segmentID <- base::unname(base::rep(base::seq_len(nSegments), difference))
@@ -47,8 +45,7 @@
     return(segmentID)
 }
 
-.addSegmentsIDtovariants <- function(variants, segmentIDs){
-
+.addSegmentsIDtovariants <- function(variants, segmentIDs) {
     variants <- variants |>
         tibble::as_tibble() |>
         dplyr::mutate(segmentID = base::unlist(segmentIDs, use.names = FALSE))
@@ -56,9 +53,8 @@
     return(variants)
 }
 
-.addEmptySegments <- function(segments, refSeq){
-
-    if(all(refSeq %in% c("hg19", "hg38"))){
+.addEmptySegments <- function(segments, refSeq) {
+    if (all(refSeq %in% c("hg19", "hg38"))) {
         chromosomeNames <- paste0("chr", c(1:22, "X", "Y", "M"))
     } else {
         chromosomeNames <- levels(segments$seqnames)
@@ -68,8 +64,7 @@
     # select chromosomes without any mutations in the sample
     emptyChromosomes <- chromosomeNames[!chromosomeNames %in% chromosomesWithMutations]
 
-    if(length(emptyChromosomes) != 0){
-
+    if (length(emptyChromosomes) != 0) {
         # construct tibble for the empty chromosomes and fill in columns accordingly
         segmentsInclEmpty <- tibble::tibble(
             seqnames = emptyChromosomes,
@@ -88,7 +83,6 @@
             ) |>
             dplyr::ungroup() |>
             dplyr::bind_rows(segments)
-
     } else {
         segmentsInclEmpty <- segments
     }
@@ -96,13 +90,12 @@
     return(segmentsInclEmpty)
 }
 
-determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates, refSeq){
-
-    segments <-  genomicVariantsAnnotated |>
+determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates, refSeq) {
+    segments <- genomicVariantsAnnotated |>
         .addSegmentsIDtovariants(segmentIDs = segmentIDs) |>
         dplyr::group_by(.data$sampleNames, .data$seqnames, .data$segmentID) |>
         dplyr::summarise(
-            .groups = 'keep',
+            .groups = "keep",
             totalVariants = base::sum(dplyr::n()),
             firstVariantID = base::min(.data$variantID),
             lastVariantID = base::max(.data$variantID),
@@ -135,7 +128,8 @@ determineSegments <- function(genomicVariantsAnnotated, segmentIDs, rates, refSe
             ),
             mutationRate = c(
                 .data$mutationRate[-base::length(.data$mutationRate)],
-                1 / .data$meanIMD[base::length(.data$meanIMD)])
+                1 / .data$meanIMD[base::length(.data$meanIMD)]
+            )
         ) |>
         dplyr::select(!diff) |>
         .addEmptySegments(refSeq) |>
