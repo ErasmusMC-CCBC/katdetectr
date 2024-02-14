@@ -26,6 +26,7 @@ Download katdetectr from BioConductor or Github:
 ```R
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
+
 BiocManager::install("katdetectr")
 ```
 
