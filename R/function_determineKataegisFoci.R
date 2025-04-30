@@ -11,8 +11,8 @@
     selectedSegments <- segments |>
         tibble::as_tibble() |>
         dplyr::mutate(IMDcutoff = {{ IMDcutoffValues }}) |>
-        dplyr::filter(.data$meanIMD <= .data$IMDcutoff) |>
-        dplyr::group_by(.data$seqnames)
+        dplyr::filter(meanIMD <= IMDcutoff) |>
+        dplyr::group_by(seqnames)
 
     return(selectedSegments)
 }
@@ -33,23 +33,23 @@
     } else {
         kataegisFoci <- kataegisSegments |>
             dplyr::mutate(
-                fociID = .determinefociID(.data$segmentID)
+                fociID = .determinefociID(segmentID)
             ) |>
-            dplyr::group_by(.data$seqnames, .data$fociID) |>
+            dplyr::group_by(seqnames, fociID) |>
             dplyr::summarise(
                 .groups = "keep",
-                seqnames = base::unique(.data$seqnames),
-                start = base::min(.data$start),
-                end = base::max(.data$end),
-                sampleNames = base::unique(.data$sampleNames),
-                totalVariants = base::sum(.data$totalVariants),
-                firstVariantID = base::min(.data$firstVariantID),
-                lastVariantID = base::max(.data$lastVariantID),
-                meanIMD = base::mean(.data$meanIMD),
-                IMDcutoff = base::unique(.data$IMDcutoff)
+                seqnames = base::unique(seqnames),
+                start = base::min(start),
+                end = base::max(end),
+                sampleNames = base::unique(sampleNames),
+                totalVariants = base::sum(totalVariants),
+                firstVariantID = base::min(firstVariantID),
+                lastVariantID = base::max(lastVariantID),
+                meanIMD = base::mean(meanIMD),
+                IMDcutoff = base::unique(IMDcutoff)
             ) |>
             dplyr::ungroup() |>
-            dplyr::filter(.data$totalVariants >= minSizeKataegis - 1)
+            dplyr::filter(totalVariants >= minSizeKataegis - 1)
     }
 
     return(kataegisFoci)
@@ -62,21 +62,21 @@
     } else {
         kataegisFociAnnotated <- kataegisFoci |>
             # remove old fociID
-            dplyr::select(!.data$fociID) |>
+            dplyr::select(!fociID) |>
             # add new correct fociID number based on rowindex
             tibble::rowid_to_column("fociID") |>
             dplyr::rowwise() |>
             # manually add the last variants to the detected kataegis foci
             dplyr::mutate(
-                firstVariantOfSeqname = base::min(genomicVariantsAnnotated$variantID[as.logical(as.character(GenomicRanges::seqnames(genomicVariantsAnnotated)) == as.character(.data$seqnames))]),
-                firstVariantID = base::ifelse(.data$firstVariantID != .data$firstVariantOfSeqname, .data$firstVariantID - 1, .data$firstVariantID),
-                totalVariants = .data$lastVariantID - .data$firstVariantID + 1
+                firstVariantOfSeqname = base::min(genomicVariantsAnnotated$variantID[as.logical(as.character(GenomicRanges::seqnames(genomicVariantsAnnotated)) == as.character(seqnames))]),
+                firstVariantID = base::ifelse(firstVariantID != firstVariantOfSeqname, firstVariantID - 1, firstVariantID),
+                totalVariants = lastVariantID - firstVariantID + 1
             ) |>
             dplyr::ungroup() |>
-            dplyr::select(!.data$firstVariantOfSeqname) |>
+            dplyr::select(!firstVariantOfSeqname) |>
             # update start of kataegis foci and add column with sample name
             dplyr::mutate(
-                start = GenomicRanges::start(genomicVariantsAnnotated[.data$firstVariantID])
+                start = GenomicRanges::start(genomicVariantsAnnotated[firstVariantID])
             ) |>
             # convert to granges
             GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE)

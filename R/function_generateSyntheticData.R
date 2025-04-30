@@ -98,9 +98,9 @@ generateSyntheticData <- function(genome = BSgenome.Hsapiens.UCSC.hg19::BSgenome
             # Name of sequence/chromosome.
             seqnames = selectedSequences,
             # Length of sequence/chromosome.
-            length = GenomeInfoDb::seqlengths(genome)[.data$seqnames],
+            length = GenomeInfoDb::seqlengths(genome)[seqnames],
             # Probability of a mutation occurring in each seqname (assuming equal probability for all basepairs).
-            probMut = .data$length / base::sum(.data$length)
+            probMut = length / base::sum(length)
         )
     return(initData)
 }
@@ -149,12 +149,12 @@ getDataKataegisVariants <- function(kataegisData) {
             seqnames = base::sample(dataInit$seqnames, prob = dataInit$probMut, size = nKataegisFoci, replace = TRUE)
         ) |>
             # Add column with length of each the seqname.
-            dplyr::inner_join(dplyr::select(dataInit, .data$seqnames, .data$length), by = "seqnames") |>
+            dplyr::inner_join(dplyr::select(dataInit, seqnames, length), by = "seqnames") |>
             dplyr::rowwise() |>
             dplyr::mutate(
                 # Determine genomic start and end location of each kataegis region
-                startKataegisFoci = base::sample(base::seq_len(.data$length - ((nKataegisVariants + 1) * expectedIMD)), size = 1, replace = TRUE),
-                endKataegisFoci = .data$startKataegisFoci + ((nKataegisVariants + 1) * expectedIMD) - 1,
+                startKataegisFoci = base::sample(base::seq_len(length - ((nKataegisVariants + 1) * expectedIMD)), size = 1, replace = TRUE),
+                endKataegisFoci = startKataegisFoci + ((nKataegisVariants + 1) * expectedIMD) - 1,
                 synthFociID = synthFociID
             ) |>
             dplyr::ungroup()
@@ -172,10 +172,10 @@ getDataKataegisVariants <- function(kataegisData) {
             # Make a separate row for all mutations
             tidyr::uncount(nKataegisVariants) |>
             # Sample start and end point within each kataegis foci
-            dplyr::group_by(.data$synthFociID) |>
+            dplyr::group_by(synthFociID) |>
             dplyr::mutate(
-                start = base::sample(base::seq(base::unique(.data$startKataegisFoci), base::unique(.data$endKataegisFoci)), size = nKataegisVariants),
-                end = .data$start,
+                start = base::sample(base::seq(base::unique(startKataegisFoci), base::unique(endKataegisFoci)), size = nKataegisVariants),
+                end = start,
                 mutType = "SNV"
             ) |>
             dplyr::ungroup()
@@ -225,25 +225,25 @@ getDataKataegisVariants <- function(kataegisData) {
         mutType = base::sample(c("SNV", "Deletion", "Insertion"), size = nBackgroundVariants, prob = probMutationType, replace = TRUE)
     ) |>
         # Add column with length of each the seqname.
-        dplyr::inner_join(dplyr::select(dataInit, .data$seqnames, .data$length), by = "seqnames") |>
+        dplyr::inner_join(dplyr::select(dataInit, seqnames, length), by = "seqnames") |>
         # Determine the number a basepairs that are involved in each mutation event.
         dplyr::mutate(
             mutLength = dplyr::case_when(
-                .data$mutType == "SNV" ~ 1,
-                .data$mutType == "Deletion" ~ base::as.numeric(sample(2:10, size = nBackgroundVariants, replace = TRUE)),
-                .data$mutType == "Insertion" ~ base::as.numeric(sample(2:9, size = nBackgroundVariants, replace = TRUE))
+                mutType == "SNV" ~ 1,
+                mutType == "Deletion" ~ base::as.numeric(sample(2:10, size = nBackgroundVariants, replace = TRUE)),
+                mutType == "Insertion" ~ base::as.numeric(sample(2:9, size = nBackgroundVariants, replace = TRUE))
             )
         ) |>
         # Perform per row.
         dplyr::rowwise() |>
         # determine genomic start location for each mutation event
         dplyr::mutate(
-            start = base::sample(base::seq_len(.data$length), size = 1, replace = TRUE)
+            start = base::sample(base::seq_len(length), size = 1, replace = TRUE)
         ) |>
-        dplyr::group_by(.data$mutType) |>
+        dplyr::group_by(mutType) |>
         # determine genomic end location for each mutation event
         dplyr::mutate(
-            end = dplyr::if_else(.data$mutType == "SNV" | .data$mutType == "Insertion", base::as.numeric(.data$start), base::as.numeric(.data$start + .data$mutLength - 1))
+            end = dplyr::if_else(mutType == "SNV" | mutType == "Insertion", base::as.numeric(start), base::as.numeric(start + mutLength - 1))
         ) |>
         dplyr::ungroup()
 
@@ -285,7 +285,7 @@ getDataKataegisVariants <- function(kataegisData) {
     dataBackgroundVariants <- dplyr::bind_rows(dataSNV, dataInsertion, dataDeletion)
 
     # remove variants that contain an N base
-    dataBackgroundVariantsNoN <- dataBackgroundVariants |> dplyr::filter(!base::grepl("N", .data$REF))
+    dataBackgroundVariantsNoN <- dataBackgroundVariants |> dplyr::filter(!base::grepl("N", REF))
     nResample <- nBackgroundVariants - base::nrow(dataBackgroundVariantsNoN)
 
     # combine all sampled variants in single tibble
@@ -331,7 +331,7 @@ getDataKataegisVariants <- function(kataegisData) {
     if (removeValidationColumns) {
         dataCombined <- dataCombined |>
             tibble::as_tibble() |>
-            dplyr::select(c(.data$seqnames, .data$start, .data$end, .data$width, .data$strand, .data$ref, .data$alt, .data$totalDepth, .data$refDepth, .data$altDepth, .data$sampleNames)) |>
+            dplyr::select(c(seqnames, start, end, width, strand, ref, alt, totalDepth, refDepth, altDepth, sampleNames)) |>
             GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE) |>
             VariantAnnotation::makeVRangesFromGRanges()
     } else {

@@ -45,17 +45,17 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
     plotDataVariants <- kd |>
         katdetectr::getGenomicVariants() |>
         .convertVariantsToGGplotFormat() |>
-        dplyr::filter(.data$seqnames %in% selectedSequences)
+        dplyr::filter(seqnames %in% selectedSequences)
 
     plotDataKataegis <- kd |>
         katdetectr::getKataegisFoci() |>
         tibble::as_tibble() |>
-        dplyr::filter(.data$seqnames %in% selectedSequences)
+        dplyr::filter(seqnames %in% selectedSequences)
 
     plotDataSegments <- kd |>
         katdetectr::getSegments() |>
         tibble::as_tibble() |>
-        dplyr::filter(.data$seqnames %in% selectedSequences)
+        dplyr::filter(seqnames %in% selectedSequences)
 
     # generate plot ------------------------------------------------------------
     p <- .generateRainfallPlot(plotDataVariants, plotDataKataegis, plotDataSegments, showKataegis, showSegmentation)
@@ -91,7 +91,7 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
             selectedSequences <- kd |>
                 katdetectr::getKataegisFoci() |>
                 tibble::as_tibble() |>
-                dplyr::distinct(.data$seqnames) |>
+                dplyr::distinct(seqnames) |>
                 dplyr::pull() |>
                 base::as.character()
         } else {
@@ -108,7 +108,7 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
     plotDataVariants <- genomicVariants |>
         tibble::as_tibble() |>
         dplyr::mutate(
-            IMD = tidyr::replace_na(.data$IMD, -1),
+            IMD = tidyr::replace_na(IMD, -1),
             variantType = dplyr::case_when(
                 ref == "C" & alt == "T" | ref == "G" & alt == "A" ~ "C>T",
                 ref == "C" & alt == "G" | ref == "G" & alt == "C" ~ "C>G",
@@ -117,7 +117,7 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
                 ref == "T" & alt == "A" | ref == "A" & alt == "T" ~ "T>A",
                 ref == "T" & alt == "G" | ref == "A" & alt == "C" ~ "T>G",
             ),
-            variantType = base::ifelse(base::is.na(.data$variantType), "Other", .data$variantType)
+            variantType = base::ifelse(base::is.na(variantType), "Other", variantType)
         )
 
     return(plotDataVariants)
@@ -125,11 +125,11 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
 
 .generateRainfallPlot <- function(plotDataVariants, plotDataKataegis, plotDataSegments, showKataegis, showSegmentation) {
     p <- plotDataVariants |>
-        ggplot2::ggplot(ggplot2::aes(x = .data$variantID, y = .data$IMD, group = .data$seqnames)) +
+        ggplot2::ggplot(ggplot2::aes(x = variantID, y = IMD, group = seqnames)) +
 
         # Plot 5' IMDs.
         ggplot2::geom_point(
-            mapping = ggplot2::aes(fill = .data$variantType, group = .data$seqnames, alpha = .data$putativeKataegis, size = .data$putativeKataegis),
+            mapping = ggplot2::aes(fill = variantType, group = seqnames, alpha = putativeKataegis, size = putativeKataegis),
             color = "black", shape = 21
         ) +
 
@@ -158,7 +158,7 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
         ggplot2::labs(y = "IMD") +
 
         # Split on chromosomes.
-        ggplot2::facet_grid(. ~ .data$seqnames, space = "free_x", scales = "free_x", drop = TRUE) +
+        ggplot2::facet_grid(. ~ seqnames, space = "free_x", scales = "free_x", drop = TRUE) +
 
         # Theme.
         ggplot2::theme(
@@ -183,7 +183,7 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
             if (showSegmentation) {
                 ggplot2::geom_segment(
                     data = plotDataSegments,
-                    mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$lastVariantID + 1, y = .data$meanIMD, yend = .data$meanIMD),
+                    mapping = ggplot2::aes(x = firstVariantID, xend = lastVariantID + 1, y = meanIMD, yend = meanIMD),
                     col = "black", lty = "solid", na.rm = TRUE
                 )
             }
@@ -192,7 +192,7 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
             if (showSegmentation) {
                 ggplot2::geom_segment(
                     data = plotDataSegments,
-                    mapping = ggplot2::aes(x = .data$firstVariantID, xend = .data$firstVariantID, y = 0, yend = Inf),
+                    mapping = ggplot2::aes(x = firstVariantID, xend = firstVariantID, y = 0, yend = Inf),
                     col = "black", lty = "dotted"
                 )
             }
@@ -202,7 +202,7 @@ rainfallPlot <- function(kd, showSequence = "All", showKataegis = TRUE, showSegm
                 ggplot2::geom_rect(
                     data = plotDataKataegis,
                     inherit.aes = FALSE,
-                    ggplot2::aes(xmin = .data$firstVariantID, xmax = .data$lastVariantID, ymin = 0, ymax = Inf, group = .data$seqnames),
+                    ggplot2::aes(xmin = firstVariantID, xmax = lastVariantID, ymin = 0, ymax = Inf, group = seqnames),
                     fill = "#0080FF30"
                 )
             }

@@ -88,7 +88,7 @@
         # rename columns
         dplyr::rename(dplyr::any_of(columnNames)) |>
         # remove rows of which start or end is NA
-        dplyr::filter(!is.na(.data$start) | !is.na(.data$end)) |>
+        dplyr::filter(!is.na(start) | !is.na(end)) |>
         # coerce to GRanges
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns = TRUE) |>
         # coerse to VRanges
